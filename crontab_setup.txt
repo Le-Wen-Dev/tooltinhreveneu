@@ -1,0 +1,28 @@
+# Cron job configuration để fetch data 2 lần mỗi ngày
+# 
+# Hướng dẫn setup:
+# 1. Mở terminal và chạy: crontab -e
+# 2. Copy 2 dòng dưới đây vào cuối file
+# 3. Thay đổi đường dẫn PROJECT_DIR trong cron_fetch.sh cho đúng với máy bạn
+# 4. Chmod script: chmod +x cron_fetch.sh
+# 5. Lưu và thoát (cron sẽ tự động reload)
+
+# Fetch data lúc 8:00 sáng mỗi ngày
+0 8 * * * /Users/lequel/Downloads/toolgetdata/cron_fetch.sh
+
+# Fetch data lúc 20:00 (8:00 PM) mỗi ngày
+0 20 * * * /Users/lequel/Downloads/toolgetdata/cron_fetch.sh
+
+# Giải thích format cron:
+# * * * * * command
+# │ │ │ │ │
+# │ │ │ │ └─── Day of week (0-7, 0 và 7 = Sunday)
+# │ │ │ └───── Month (1-12)
+# │ │ └─────── Day of month (1-31)
+# │ └───────── Hour (0-23)
+# └─────────── Minute (0-59)
+
+# Ví dụ khác:
+# 0 6,18 * * *  -> 6:00 AM và 6:00 PM mỗi ngày
+# 0 */12 * * *  -> Mỗi 12 giờ (0:00 và 12:00)
+# 0 9,21 * * *  -> 9:00 AM và 9:00 PM

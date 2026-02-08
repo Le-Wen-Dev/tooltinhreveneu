@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if edit_user %}Edit User{% else %}New User{% endif %} - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">{% if edit_user %}Edit User{% else %}New User{% endif %}</h1>
+            <div class="flex items-center gap-3">
+                <span class="text-emerald-100 text-sm">{% if user %}{{ user.username }} (admin){% endif %}</span>
+                <a href="/logout" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-medium transition-colors">Logout</a>
+            </div>
+        </div>
+    </div>
+    <div class="container mx-auto px-6 py-4 flex gap-4 border-b bg-white shadow-sm">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/users" class="font-semibold text-emerald-600">Users</a>
+    </div>
+    <div class="container mx-auto px-6 py-6 max-w-xl">
+        {% if error %}
+        <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">{{ error }}</div>
+        {% endif %}
+        <form method="post" action="{% if edit_user %}/users/{{ edit_user.id }}{% else %}/users{% endif %}" class="bg-white rounded-xl shadow-sm p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <input type="text" name="username" required value="{{ edit_user.username if edit_user else '' }}"
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" name="email" required value="{{ edit_user.email if edit_user else '' }}"
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password {% if edit_user %}(leave blank to keep){% endif %}</label>
+                <input type="password" name="password" {% if not edit_user %}required{% endif %}
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                       placeholder="{% if edit_user %}Leave blank to keep current{% endif %}">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <select name="role" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                    <option value="user" {% if edit_user and edit_user.role == 'user' %}selected{% endif %}>user</option>
+                    <option value="admin" {% if edit_user and edit_user.role == 'admin' %}selected{% endif %}>admin</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" name="can_view_data" id="can_view_data" value="true" {% if edit_user and edit_user.can_view_data %}checked{% endif %}
+                       class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                <label for="can_view_data" class="text-sm font-medium text-gray-700">Can view data & use API</label>
+            </div>
+            {% if edit_user and edit_user.can_view_data and edit_user.api_key %}
+            <div class="p-3 bg-gray-50 rounded-xl text-sm">
+                <span class="text-gray-600">API Key:</span>
+                <code class="block mt-1 break-all font-mono text-gray-900">{{ edit_user.api_key }}</code>
+                <p class="text-gray-500 mt-1">Use in header: <code>X-API-Key: {{ edit_user.api_key }}</code></p>
+            </div>
+            {% endif %}
+            <div class="flex gap-2 pt-2">
+                <button type="submit" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl transition-colors">Save</button>
+                <a href="/users" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-xl transition-colors">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

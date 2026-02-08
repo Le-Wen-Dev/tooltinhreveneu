@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gliacloud</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Gliacloud</h1>
+            <div class="flex items-center gap-4">
+                <span class="text-emerald-100 text-sm">{% if user %}{{ user.username }}{% if user.role == 'admin' %} (admin){% endif %}{% endif %}</span>
+                <a href="/logout" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-medium transition-colors">Logout</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container mx-auto px-6 py-4 flex flex-wrap gap-4 border-b bg-white shadow-sm">
+        <a href="/dashboard" class="text-emerald-600 font-semibold">Dashboard</a>
+        <a href="/data" class="text-gray-600 hover:text-emerald-600 font-medium">Data Table</a>
+        {% if user and user.role == 'admin' %}
+        <a href="/users" class="text-gray-600 hover:text-emerald-600 font-medium">Users</a>
+        {% endif %}
+    </div>
+    
+    <div class="container mx-auto px-6 py-6 max-w-4xl">
+    <p class="text-gray-600">Use <a href="/data" class="text-emerald-600 hover:underline font-medium">Data Table</a> to view data and trigger crawl (Manual) from the data page.</p>
+    </div>
+</body>
+</html>

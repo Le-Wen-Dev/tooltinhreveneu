@@ -1,0 +1,24 @@
+   ./deploy-to-vps.sh
+cd /Users/lequel/Downloads/toolgetdata# 
+
+scp -P 22 api-image.tar crawler-image.tar root@103.37.60.86:/srv/toolgetdata/
+
+scp -P 22 docker-compose.vps.yml database_schema_complete.sql migrations_add_users_table.sql seed_users.sql run-crawler.sh root@103.37.60.86:/srv/toolgetdata/
+
+scp -P 22 .env root@103.37.60.86:/srv/toolgetdata/
+
+AloodmKYVRf7
+
+ssh root@103.37.60.86
+
+cd /srv/toolgetdata
+
+docker load -i api-image.tar
+docker load -i crawler-image.tar
+
+docker-compose -f docker-compose.vps.yml down
+docker-compose -f docker-compose.vps.yml up -d
+
+
+docker-compose -f docker-compose.vps.yml ps
+curl http://localhost:8000/health

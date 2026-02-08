@@ -1,0 +1,125 @@
+
+Dash Admin: admin - Admin@!321
+Dash Khách: maxvaluemedia Maxvalue@2026
+https://beta.gliacloud.online/
+# Optional: BASE_URL (no trailing slash) – dùng cho link API Docs và ví dụ curl trong trang API Docs. Mặc định: https://beta.gliacloud.online
+# BASE_URL=https://beta.gliacloud.online
+
+Hosting
+URL: http://36.50.27.158:2222/
+Username: tooltinhreveneu@gmail.com
+Pass: tooltinhreveneu@gmail.com
+
+DB url: 
+Db name: 
+DB user: 
+DB pass: tooltinhreveneu@gndhsggkl
+
+
+Database:	tooltinhreveneu_1
+Host:	localhost
+Username:	tooltinhreveneu_1
+Password:	tooltinhreveneu@gndhsggkl
+
+Deploy va update code khi có update 
+
+Option 2: Dùng MySQL container trong Docker
+Nếu muốn dùng MySQL container (isolated hơn), dùng docker-compose.yml hiện tại:
+# Trên VPS, sau khi load imagesdocker compose up -d# MySQL sẽ tự động import schema từ database_schema_complete.sql# Đợi 30-40 giây để MySQL khởi động xong# Verifydocker compose psdocker compose logs db | tail -20
+Checklist sau khi deploy
+[ ] Images đã load vào Docker
+[ ] Database schema đã import
+[ ] File .env đã tạo
+[ ] API service đã chạy (docker compose ps)
+[ ] API health check OK (curl http://localhost:8000/health)
+[ ] Crawler test thành công
+[ ] Cron job đã setup
+[ ] Logs directory đã tạo
+Update sau này
+Khi có code mới:
+# 1. Trên máy local: Build và save imagesdocker compose build./save-and-push-images.sh# 2. Upload lên VPSscp -P 2222 crawler-image.tar api-image.tar tooltinhreveneu@gmail.com@36.50.27.158:/srv/toolgetdata/# 3. Trên VPS: Load và restartssh tooltinhreveneu@gmail.com@36.50.27.158 -p 2222cd /srv/toolgetdatadocker load -i crawler-image.tardocker load -i api-image.tardocker compose up -d --force-recreate api
+Troubleshooting
+API không kết nối được MySQL:
+# Check logsdocker compose logs api# Test connection từ containerdocker compose exec api python -c "from sqlalchemy import create_engine; import os; engine = create_engine(f'mysql+pymysql://{os.getenv(\"DB_USER\")}:{os.getenv(\"DB_PASSWORD\")}@{os.getenv(\"DB_HOST\")}:{os.getenv(\"DB_PORT\")}/{os.getenv(\"DB_NAME\")}'); engine.connect(); print('OK')"
+Crawler không chạy:
+# Check logsdocker compose logs crawler# Test manualdocker compose run --rm crawler --first-page-only
+Bạn muốn dùng Option 1 (MySQL có sẵn) hay Option 2 (MySQL container)? Tôi có thể tạo file docker-compose.prod.yml nếu cần.
+
+
+
+
+Cụm tinh năng tool get data
+1 Core là get data và tính Theo công thức sau đó trả ra API đã xong -> cần update lại bộ lọc cho phép lọc bằng lịch vì nguyên năm là nhiều lắm 
+2. Thêm tính năng login logout register, crud user cho role “admin”, admin có quyền crud người dùng -> admin cấp quyền để người dùng được xem bảng data và khi được xem data là được coi theo dạng api, viết document cho người dùng cách dùng api trên web luôn ( get để show và filter thôi )  và bạn tự design db để tính năng đó hoạt động
+Không cần viết document các file .md đi kèm trong source  chỉ cần xong là ok 
+Đang xem cấu trúc hiện tại của API, bộ lọc và admin để triển khai: (1) bộ lọc theo khoảng ngày, (2) đăng nhập/đăng xuất/đăng ký và CRUD user cho admin, (3) phân quyền xem data và tài liệu API trên web.
+Xoá phần này 
+Actions
+Create New Formula Manage Formulas
+Xoá cái này luôn 🧪 Test Crawl (First Page Only)
+Xoá cái formulas trên menu luon 
+. Tool đã đảm bảo mỗi ngày cào 2 lần chưa?
+* Chưa tự chạy. Tool không tự lên lịch; cần cấu hình cron trên server (VPS) để chạy crawler 2 lần/ngày.
+* Trong QUICK_START.md đã thêm mục “Cào 2 lần mỗi ngày & lưu hết” với ví dụ cron:
+0 1,13 * * * cd /path/to/toolgetdata && docker compose run --rm crawler >> /var/log/revenue-crawler.log 2>&1
+* 0 1,13 * * * = mỗi ngày lúc 1:00 và 13:00.
+* Không dùng --first-page-only → mỗi lần chạy full (tất cả trang), lưu hết raw cho ngày (mặc định là hôm qua).
+
+
+
+
+
+
+request update
+1. Ẩn nút craw của role user
+2. form login xoá desc reveneu share data để chữ Gliacloud login 
+3. Title ở trên sửa thành Glia Dashboard của role user là hiện table luôn bỏ cái tab dashboard 
+4. Bảng table của 
+Ở role user sẽ
+thay gía trị của 
+Total Player IMPR 2 -> vào Total Player IMPR 
+Revenue 2 -> vào Revenue 
+RPM 2-> vào RPM 
+Ẩn cột share 50% luôn
+rồi xoá mấy cột Cụm Total Player IMPR 2	Revenue 2	RPM 2	 đi 
+5. Giá trị của Fetch Date sẽ load vào Time Unit và xoá cột Fetch date đi 
+6. Xoá  nút API docs ở gần nút login 
+7. Chữ proccessed ở tất cả vị trí chuyển thành chữ Dashboard
+8. Filter " single date" đổi thành lọc theo tên web ( giá trị của cột " Slot cũ " và cột slot cũ chuyển thành " website"
+9. Ở phía trên cái bảng có phần này 
+Processed Data
+Total Records: 3
+Latest Fetch Date: 2026-01-27
+Last Processed: 2026-01-28 10:28:18
+Hãy xoá nó đi 
+
+10. ở role user ko hiện những từ liên quan đến triggle và craw
+11. kiểm tra lại tính năng craw đang ko kéo được data ngày của các ngày trước đó vì filter ko ra
+12. Sau khi search xong xoá nút triggle ở dưới bảng ( nếu ko filter ko ra thông tin thì để not found là được )
+13. url là /login không cần /admin chỉ check role và ra đúng màn hình là được. 
+14. TItle Revenue Share Data - Admin đổi thành Gliacloud 
+15. chữ tất cả chỗ filter theo web đổi thành all
+16. Data trả ra ở role user khi user gọi API cũng sẽ hiển thị tương tự Bảng table của 
+Ở role user sẽ
+thay gía trị của 
+Total Player IMPR 2 -> vào Total Player IMPR 
+Revenue 2 -> vào Revenue 
+RPM 2-> vào RPM 
+Ẩn luôn cái cọt share 50%
+rồi xoá mấy cột Cụm Total Player IMPR 2	Revenue 2	RPM 2	 đi 
+17. endpoint dùng /api/data (đã bỏ processed). Example: curl -H "X-API-Key: YOUR_KEY" "https://beta.gliacloud.online/api/data?from_date=2026-01-01&to_date=2026-01-31"
+
+ 18. ở màn role admin TItle Revenue Share Data - Admin đổi thành Gliacloud 
+ 19. ở màn role admin Ở phía trên cái bảng có phần này 
+Processed Data
+Total Records: 3
+Latest Fetch Date: 2026-01-27
+Last Processed: 2026-01-28 10:28:18
+Hãy xoá nó đi 
+
+20. ở role admin Xoá  nút API docs ở gần nút login 
+21. ở role admin Giá trị của Fetch Date sẽ load vào Time Unit và xoá cột Fetch date đi 
+
+
+22. tab raw data của role admin cột single date cũng chuyển thành filter theo website luôn
+23. Xoá Proccess at ở response api user 

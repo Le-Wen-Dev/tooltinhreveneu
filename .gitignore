@@ -1,0 +1,4 @@
+
+# ignore docker image tar
+*.tar
+

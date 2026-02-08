@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulas Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .btn { padding: 5px 10px; text-decoration: none; border-radius: 3px; margin: 2px; }
+        .btn-edit { background: #2196F3; color: white; }
+        .btn-delete { background: #f44336; color: white; }
+        .btn-compute { background: #FF9800; color: white; }
+        .active { color: green; }
+        .inactive { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Formulas Management</h1>
+    <a href="/formulas/new" class="btn" style="background: #4CAF50; color: white; padding: 10px 20px;">Create New Formula</a>
+    <a href="/dashboard">Back to Dashboard</a>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Expression</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for formula in formulas %}
+            <tr>
+                <td>{{ formula.id }}</td>
+                <td>{{ formula.name }}</td>
+                <td>{{ formula.formula_type }}</td>
+                <td><code>{{ formula.formula_expression[:50] }}{% if formula.formula_expression|length > 50 %}...{% endif %}</code></td>
+                <td>
+                    {% if formula.is_active %}
+                        <span class="active">Active</span>
+                    {% else %}
+                        <span class="inactive">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/formulas/{{ formula.id }}/edit" class="btn btn-edit">Edit</a>
+                    <form method="post" action="/formulas/{{ formula.id }}/compute" style="display: inline;">
+                        <button type="submit" class="btn btn-compute">Compute</button>
+                    </form>
+                    <form method="post" action="/formulas/{{ formula.id }}/delete" style="display: inline;">
+                        <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,288 @@
+2026-01-28 06:22:07,308 - crawler.lock - INFO - Lock acquired for 2026-01-27
+2026-01-28 06:22:07,315 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 06:22:17,952 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 06:22:20,145 - __main__ - INFO - Fetched 6 records
+2026-01-28 06:22:20,253 - __main__ - INFO - Stored: 6 created, 0 updated
+2026-01-28 06:22:20,254 - __main__ - INFO - Computing formulas...
+2026-01-28 06:22:20,310 - __main__ - INFO - Formulas computed successfully
+2026-01-28 06:22:20,317 - __main__ - INFO - Fetch completed successfully in 13s
+2026-01-28 06:22:20,321 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 06:25:04,760 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 6, 25, 4, 758476), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 06:25:04,761 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 06:26:30,059 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 6, 26, 30, 55493), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 06:26:30,060 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 06:26:41,564 - crawler.lock - INFO - Lock acquired for 2026-01-28
+2026-01-28 06:26:41,577 - __main__ - INFO - Starting fetch for date: 2026-01-28
+2026-01-28 06:26:51,482 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-28&time_unit_date__range__lte=2026-01-28
+2026-01-28 06:26:53,084 - __main__ - ERROR - No data fetched
+2026-01-28 06:26:53,091 - crawler.lock - INFO - Lock released for 2026-01-28
+2026-01-28 06:27:04,754 - crawler.lock - INFO - Lock acquired for 2026-01-26
+2026-01-28 06:27:04,759 - __main__ - INFO - Starting fetch for date: 2026-01-26
+2026-01-28 06:27:14,425 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-26&time_unit_date__range__lte=2026-01-26
+2026-01-28 06:27:16,579 - __main__ - INFO - Fetched 6 records
+2026-01-28 06:27:16,599 - __main__ - INFO - Stored: 6 created, 0 updated
+2026-01-28 06:27:16,599 - __main__ - INFO - Computing formulas...
+2026-01-28 06:27:16,631 - __main__ - INFO - Formulas computed successfully
+2026-01-28 06:27:16,637 - __main__ - INFO - Fetch completed successfully in 11s
+2026-01-28 06:27:16,642 - crawler.lock - INFO - Lock released for 2026-01-26
+2026-01-28 06:30:25,937 - crawler.lock - INFO - Lock acquired for 2026-01-27
+2026-01-28 06:30:25,946 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 06:30:34,428 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 06:30:36,870 - __main__ - INFO - Fetched 6 records
+2026-01-28 06:30:36,904 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 06:30:36,905 - __main__ - INFO - Computing formulas...
+2026-01-28 06:30:36,946 - __main__ - INFO - Formulas computed successfully
+2026-01-28 06:30:36,953 - __main__ - INFO - Fetch completed successfully in 10s
+2026-01-28 06:30:36,956 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 06:48:32,253 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 6, 48, 32, 251180), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 06:48:32,253 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 12:44:30,207 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 12, 44, 30, 204698), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 12:44:30,209 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 12:52:07,954 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 12, 52, 7, 952969), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 12:52:07,955 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 12:55:31,082 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 12, 55, 31, 80799), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 12:55:31,083 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 12:58:47,681 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 12, 58, 47, 679215), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 12:58:47,682 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 13:09:55,401 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 13, 9, 55, 397787), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 13:09:55,402 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 13:12:30,005 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 13, 12, 30, 1859), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 13:12:30,006 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 13:15:17,133 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 13, 15, 17, 129713), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 13:15:17,134 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 13:15:19,695 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.IntegrityError) (1062, "Duplicate entry '2026-01-27' for key 'crawl_runs.fetch_date'")
+[SQL: INSERT INTO crawl_runs (fetch_date, status, started_at, completed_at, pid) VALUES (%(fetch_date)s, %(status)s, %(started_at)s, %(completed_at)s, %(pid)s)]
+[parameters: {'fetch_date': datetime.date(2026, 1, 27), 'status': 'running', 'started_at': datetime.datetime(2026, 1, 28, 13, 15, 19, 692550), 'completed_at': None, 'pid': 1}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-01-28 13:15:19,696 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 13:17:53,679 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 13:17:53,691 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 13:18:00,955 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 13:18:02,886 - __main__ - INFO - Fetched 6 records
+2026-01-28 13:18:02,913 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 13:18:02,913 - __main__ - INFO - Computing formulas...
+2026-01-28 13:18:02,950 - __main__ - INFO - Formulas computed successfully
+2026-01-28 13:18:02,954 - __main__ - INFO - Fetch completed successfully in 8s
+2026-01-28 13:18:02,958 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 13:26:49,373 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 13:26:49,381 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 13:26:57,086 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 13:26:58,664 - __main__ - INFO - Fetched 6 records
+2026-01-28 13:26:58,743 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 13:26:58,743 - __main__ - INFO - Computing formulas...
+2026-01-28 13:26:58,859 - __main__ - INFO - Formulas computed successfully
+2026-01-28 13:26:58,881 - __main__ - INFO - Fetch completed successfully in 9s
+2026-01-28 13:26:58,900 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 13:44:18,100 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 13:44:18,107 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 13:44:24,784 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 13:44:27,104 - __main__ - INFO - Fetched 6 records
+2026-01-28 13:44:27,134 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 13:44:27,134 - __main__ - INFO - Computing formulas...
+2026-01-28 13:44:27,168 - __main__ - INFO - Formulas computed successfully
+2026-01-28 13:44:27,174 - __main__ - INFO - Fetch completed successfully in 9s
+2026-01-28 13:44:27,178 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 13:48:14,445 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 13:48:14,451 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 13:48:20,961 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 13:48:22,568 - __main__ - INFO - Fetched 6 records
+2026-01-28 13:48:22,588 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 13:48:22,588 - __main__ - INFO - Computing formulas...
+2026-01-28 13:48:22,620 - __main__ - INFO - Formulas computed successfully
+2026-01-28 13:48:22,626 - __main__ - INFO - Fetch completed successfully in 8s
+2026-01-28 13:48:22,630 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 14:26:02,116 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on 'db' ([Errno -2] Name or service not known)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-01-28 14:26:02,116 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 15:24:47,810 - crawler.lock - ERROR - Error acquiring lock: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on 'db' ([Errno 111] Connection refused)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-01-28 15:24:47,811 - __main__ - WARNING - Another crawler is already running for 2026-01-27. Exiting.
+2026-01-28 15:37:23,550 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 15:37:23,557 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 15:37:31,286 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 15:37:32,617 - __main__ - INFO - Fetched 6 records
+2026-01-28 15:37:32,637 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 15:37:32,637 - __main__ - INFO - Computing formulas...
+2026-01-28 15:37:32,670 - __main__ - INFO - Formulas computed successfully
+2026-01-28 15:37:32,674 - __main__ - INFO - Fetch completed successfully in 8s
+2026-01-28 15:37:32,678 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 15:48:31,620 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 15:48:31,626 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 15:48:39,477 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 15:48:41,301 - __main__ - INFO - Fetched 6 records
+2026-01-28 15:48:41,328 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 15:48:41,328 - __main__ - INFO - Computing formulas...
+2026-01-28 15:48:41,358 - __main__ - INFO - Formulas computed successfully
+2026-01-28 15:48:41,363 - __main__ - INFO - Fetch completed successfully in 9s
+2026-01-28 15:48:41,367 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 15:53:13,991 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 15:53:13,999 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 15:53:22,256 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 15:53:24,802 - __main__ - INFO - Fetched 6 records
+2026-01-28 15:53:24,823 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 15:53:24,823 - __main__ - INFO - Computing formulas...
+2026-01-28 15:53:24,861 - __main__ - INFO - Formulas computed successfully
+2026-01-28 15:53:24,868 - __main__ - INFO - Fetch completed successfully in 10s
+2026-01-28 15:53:24,872 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 16:10:42,014 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 16:10:42,020 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 16:10:49,090 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 16:10:50,578 - __main__ - INFO - Fetched 6 records
+2026-01-28 16:10:50,603 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 16:10:50,603 - __main__ - INFO - Computing formulas...
+2026-01-28 16:10:50,655 - __main__ - INFO - Formulas computed successfully
+2026-01-28 16:10:50,664 - __main__ - INFO - Fetch completed successfully in 8s
+2026-01-28 16:10:50,669 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 16:21:45,735 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 16:21:45,744 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 16:21:54,575 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 16:21:56,426 - __main__ - INFO - Fetched 6 records
+2026-01-28 16:21:56,452 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 16:21:56,452 - __main__ - INFO - Computing formulas...
+2026-01-28 16:21:56,485 - __main__ - INFO - Formulas computed successfully
+2026-01-28 16:21:56,490 - __main__ - INFO - Fetch completed successfully in 10s
+2026-01-28 16:21:56,494 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 16:29:20,916 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 16:29:20,930 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 16:29:28,220 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 16:29:30,535 - __main__ - INFO - Fetched 6 records
+2026-01-28 16:29:30,556 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 16:29:30,556 - __main__ - INFO - Computing formulas...
+2026-01-28 16:29:30,586 - __main__ - INFO - Formulas computed successfully
+2026-01-28 16:29:30,591 - __main__ - INFO - Fetch completed successfully in 9s
+2026-01-28 16:29:30,594 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 17:00:01,947 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 17:00:01,957 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 17:00:10,006 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 17:00:11,403 - __main__ - INFO - Fetched 6 records
+2026-01-28 17:00:11,421 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 17:00:11,421 - __main__ - INFO - Computing formulas...
+2026-01-28 17:00:11,458 - __main__ - INFO - Formulas computed successfully
+2026-01-28 17:00:11,462 - __main__ - INFO - Fetch completed successfully in 9s
+2026-01-28 17:00:11,470 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 17:01:15,749 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 17:01:15,757 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 17:01:25,376 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 17:01:28,152 - __main__ - INFO - Fetched 6 records
+2026-01-28 17:01:28,200 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 17:01:28,201 - __main__ - INFO - Computing formulas...
+2026-01-28 17:01:28,320 - __main__ - INFO - Formulas computed successfully
+2026-01-28 17:01:28,334 - __main__ - INFO - Fetch completed successfully in 12s
+2026-01-28 17:01:28,346 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 17:13:43,830 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 17:13:43,837 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 17:13:52,905 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 17:13:55,592 - __main__ - INFO - Fetched 6 records
+2026-01-28 17:13:55,621 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 17:13:55,621 - __main__ - INFO - Computing formulas...
+2026-01-28 17:13:55,654 - __main__ - INFO - Formulas computed successfully
+2026-01-28 17:13:55,659 - __main__ - INFO - Fetch completed successfully in 11s
+2026-01-28 17:13:55,663 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-28 17:28:29,394 - crawler.lock - INFO - Lock acquired for 2026-01-27 (reused row)
+2026-01-28 17:28:29,402 - __main__ - INFO - Starting fetch for date: 2026-01-27
+2026-01-28 17:28:37,680 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-27&time_unit_date__range__lte=2026-01-27
+2026-01-28 17:28:39,610 - __main__ - INFO - Fetched 6 records
+2026-01-28 17:28:39,648 - __main__ - INFO - Stored: 0 created, 6 updated
+2026-01-28 17:28:39,648 - __main__ - INFO - Computing formulas...
+2026-01-28 17:28:39,742 - __main__ - INFO - Formulas computed successfully
+2026-01-28 17:28:39,759 - __main__ - INFO - Fetch completed successfully in 10s
+2026-01-28 17:28:39,772 - crawler.lock - INFO - Lock released for 2026-01-27
+2026-01-30 13:58:53,563 - crawler.lock - INFO - Lock acquired for 2026-01-29
+2026-01-30 13:58:53,577 - __main__ - INFO - Starting fetch for date: 2026-01-29
+2026-01-30 13:59:00,274 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-29&time_unit_date__range__lte=2026-01-29
+2026-01-30 13:59:01,666 - __main__ - INFO - Fetched 9 records
+2026-01-30 13:59:01,688 - __main__ - INFO - Stored: 9 created, 0 updated
+2026-01-30 13:59:01,688 - __main__ - INFO - Computing formulas...
+2026-01-30 13:59:01,733 - __main__ - INFO - Formulas computed successfully
+2026-01-30 13:59:01,740 - __main__ - INFO - Fetch completed successfully in 7s
+2026-01-30 13:59:01,746 - crawler.lock - INFO - Lock released for 2026-01-29
+2026-01-30 14:19:35,927 - crawler.lock - INFO - Lock acquired for 2026-01-29 (reused row)
+2026-01-30 14:19:35,933 - __main__ - INFO - Starting fetch for date: 2026-01-29
+2026-01-30 14:19:42,551 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-29&time_unit_date__range__lte=2026-01-29
+2026-01-30 14:19:44,404 - __main__ - INFO - Fetched 9 records
+2026-01-30 14:19:44,422 - __main__ - INFO - Stored: 0 created, 9 updated
+2026-01-30 14:19:44,422 - __main__ - INFO - Computing formulas...
+2026-01-30 14:19:44,472 - __main__ - INFO - Formulas computed successfully
+2026-01-30 14:19:44,490 - __main__ - INFO - Processed revenue data updated for dashboard.
+2026-01-30 14:19:44,495 - __main__ - INFO - Fetch completed successfully in 8s
+2026-01-30 14:19:44,499 - crawler.lock - INFO - Lock released for 2026-01-29
+2026-01-30 14:25:53,636 - crawler.lock - INFO - Lock acquired for 2026-01-29 (reused row)
+2026-01-30 14:25:53,642 - __main__ - INFO - Starting fetch for date: 2026-01-29
+2026-01-30 14:26:00,565 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-29&time_unit_date__range__lte=2026-01-29
+2026-01-30 14:26:01,850 - __main__ - INFO - Fetched 9 records
+2026-01-30 14:26:01,868 - __main__ - INFO - Stored: 0 created, 9 updated
+2026-01-30 14:26:01,868 - __main__ - INFO - Computing formulas...
+2026-01-30 14:26:01,907 - __main__ - INFO - Formulas computed successfully
+2026-01-30 14:26:01,916 - __main__ - INFO - Processed revenue data updated for dashboard.
+2026-01-30 14:26:01,920 - __main__ - INFO - Fetch completed successfully in 7s
+2026-01-30 14:26:01,923 - crawler.lock - INFO - Lock released for 2026-01-29
+2026-01-30 14:32:50,988 - crawler.lock - INFO - Lock acquired for 2026-01-29 (reused row)
+2026-01-30 14:32:50,994 - __main__ - INFO - Starting fetch for date: 2026-01-29
+2026-01-30 14:32:57,444 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-29&time_unit_date__range__lte=2026-01-29
+2026-01-30 14:32:59,691 - __main__ - INFO - Fetched 9 records
+2026-01-30 14:32:59,711 - __main__ - INFO - Stored: 0 created, 9 updated
+2026-01-30 14:32:59,711 - __main__ - INFO - Computing formulas...
+2026-01-30 14:32:59,748 - __main__ - INFO - Formulas computed successfully
+2026-01-30 14:32:59,756 - __main__ - INFO - Processed revenue data updated for dashboard.
+2026-01-30 14:32:59,760 - __main__ - INFO - Fetch completed successfully in 8s
+2026-01-30 14:32:59,765 - crawler.lock - INFO - Lock released for 2026-01-29
+2026-01-30 14:40:43,490 - crawler.lock - INFO - Lock acquired for 2026-01-29 (reused row)
+2026-01-30 14:40:43,496 - __main__ - INFO - Starting fetch for date: 2026-01-29
+2026-01-30 14:40:50,120 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-29&time_unit_date__range__lte=2026-01-29
+2026-01-30 14:40:51,536 - __main__ - INFO - Fetched 9 records
+2026-01-30 14:40:51,554 - __main__ - INFO - Stored: 0 created, 9 updated
+2026-01-30 14:40:51,554 - __main__ - INFO - Computing formulas...
+2026-01-30 14:40:51,598 - __main__ - INFO - Formulas computed successfully
+2026-01-30 14:40:51,629 - __main__ - INFO - Processed revenue data updated for dashboard.
+2026-01-30 14:40:51,648 - __main__ - INFO - Fetch completed successfully in 8s
+2026-01-30 14:40:51,661 - crawler.lock - INFO - Lock released for 2026-01-29
+2026-01-31 02:19:51,760 - crawler.lock - INFO - Lock acquired for 2026-01-30
+2026-01-31 02:19:51,770 - __main__ - INFO - Starting fetch for date: 2026-01-30
+2026-01-31 02:20:00,811 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-01-30&time_unit_date__range__lte=2026-01-30
+2026-01-31 02:20:02,806 - __main__ - INFO - Fetched 9 records
+2026-01-31 02:20:02,925 - __main__ - INFO - Stored: 9 created, 0 updated
+2026-01-31 02:20:02,926 - __main__ - INFO - Computing formulas...
+2026-01-31 02:20:02,989 - __main__ - INFO - Formulas computed successfully
+2026-01-31 02:20:03,003 - __main__ - INFO - Processed revenue data updated for dashboard.
+2026-01-31 02:20:03,008 - __main__ - INFO - Fetch completed successfully in 11s
+2026-01-31 02:20:03,013 - crawler.lock - INFO - Lock released for 2026-01-30
+2026-02-08 18:48:40,019 - crawler.lock - INFO - Lock acquired for 2026-02-07
+2026-02-08 18:48:40,027 - __main__ - INFO - Starting fetch for date: 2026-02-07
+2026-02-08 18:48:47,011 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-02-07&time_unit_date__range__lte=2026-02-07
+2026-02-08 18:48:49,900 - __main__ - INFO - Fetched 17 records
+2026-02-08 18:48:49,926 - __main__ - INFO - Stored: 17 created, 0 updated
+2026-02-08 18:48:49,927 - __main__ - INFO - Computing formulas...
+2026-02-08 18:48:49,972 - __main__ - INFO - Formulas computed successfully
+2026-02-08 18:48:49,989 - __main__ - INFO - Processed revenue data updated for dashboard.
+2026-02-08 18:48:49,994 - __main__ - INFO - Fetch completed successfully in 9s
+2026-02-08 18:48:49,997 - crawler.lock - INFO - Lock released for 2026-02-07

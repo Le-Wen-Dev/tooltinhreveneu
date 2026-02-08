@@ -1,0 +1,68 @@
+# Docker Compose cho local testing với MySQL container
+version: '3.8'
+
+services:
+  crawler:
+    build:
+      context: .
+      dockerfile: crawler/Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - revenue-network
+    restart: "no"
+    entrypoint: ["python", "crawler/main.py"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    networks:
+      - revenue-network
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: tooltinhreveneu_1
+      MYSQL_USER: tooltinhreveneu_1
+      MYSQL_PASSWORD: tooltinhreveneu@gndhsggkl
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database_schema_complete.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - revenue-network
+    ports:
+      - "3307:3306"  # Map to 3307 để không conflict với MySQL local nếu có
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  revenue-network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local

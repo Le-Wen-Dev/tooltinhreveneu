@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if formula %}Edit{% else %}New{% endif %} Formula</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 800px; }
+        form { background: #f9f9f9; padding: 20px; border-radius: 5px; }
+        label { display: block; margin: 10px 0 5px 0; font-weight: bold; }
+        input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 3px; }
+        textarea { height: 100px; }
+        .btn { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px; }
+        .btn:hover { background: #45a049; }
+        .help-text { color: #666; font-size: 0.9em; margin-top: -5px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>{% if formula %}Edit{% else %}Create New{% endif %} Formula</h1>
+    <a href="/formulas">Back to Formulas</a>
+    
+    <form method="post" action="{% if formula %}/formulas/{{ formula.id }}{% else %}/formulas{% endif %}">
+        <label for="name">Formula Name:</label>
+        <input type="text" id="name" name="name" value="{% if formula %}{{ formula.name }}{% endif %}" required>
+        <div class="help-text">Unique identifier for this formula (e.g., 'rpm_combined')</div>
+        
+        <label for="description">Description:</label>
+        <textarea id="description" name="description">{% if formula %}{{ formula.description or '' }}{% endif %}</textarea>
+        
+        <label for="formula_type">Formula Type:</label>
+        <select id="formula_type" name="formula_type" required>
+            {% for ftype in formula_types %}
+            <option value="{{ ftype }}" {% if formula and formula.formula_type == ftype %}selected{% endif %}>{{ ftype }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="formula_expression">Formula Expression:</label>
+        <textarea id="formula_expression" name="formula_expression" required>{% if formula %}{{ formula.formula_expression }}{% endif %}</textarea>
+        <div class="help-text">
+            Examples:<br>
+            - Row-level: (net_revenue_usd / total_player_impr) * 1000<br>
+            - Aggregated: sum(net_revenue_usd for all rows)<br>
+            Available fields: total_player_impr, total_ad_impr, rpm, gross_revenue_usd, net_revenue_usd
+        </div>
+        
+        <label>
+            <input type="checkbox" name="is_active" {% if not formula or formula.is_active %}checked{% endif %}>
+            Active
+        </label>
+        
+        <button type="submit" class="btn">{% if formula %}Update{% else %}Create{% endif %} Formula</button>
+        <a href="/formulas" class="btn" style="background: #666; text-decoration: none; display: inline-block;">Cancel</a>
+    </form>
+</body>
+</html>

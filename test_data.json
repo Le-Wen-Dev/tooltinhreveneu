@@ -1,0 +1,62 @@
+[
+  {
+    "channel": "maxvaluemedia_spotpariz",
+    "slot": "spotpariz_desktop",
+    "time unit": "2026/01",
+    "total player impr": "998",
+    "total ad impr": "13,937",
+    "rpm": "40.91",
+    "gross revenue (usd)": "40.82",
+    "net revenue (usd)": "28.58"
+  },
+  {
+    "channel": "maxvaluemedia_spotpariz",
+    "slot": "spotpariz_mobile",
+    "time unit": "2026/01",
+    "total player impr": "10,214",
+    "total ad impr": "57,297",
+    "rpm": "12.29",
+    "gross revenue (usd)": "125.54",
+    "net revenue (usd)": "87.88"
+  },
+  {
+    "channel": "maxvaluemedia_spotpariz",
+    "slot": "spotpariz_news_desktop",
+    "time unit": "2026/01",
+    "total player impr": "13",
+    "total ad impr": "-",
+    "rpm": "-",
+    "gross revenue (usd)": "-",
+    "net revenue (usd)": "-"
+  },
+  {
+    "channel": "maxvaluemedia_spotpariz",
+    "slot": "spotpariz_news_mobile",
+    "time unit": "2026/01",
+    "total player impr": "6",
+    "total ad impr": "-",
+    "rpm": "-",
+    "gross revenue (usd)": "-",
+    "net revenue (usd)": "-"
+  },
+  {
+    "channel": "maxvaluemedia_spotpariz",
+    "slot": "spotpariz_true_desktop",
+    "time unit": "2026/01",
+    "total player impr": "7",
+    "total ad impr": "-",
+    "rpm": "-",
+    "gross revenue (usd)": "-",
+    "net revenue (usd)": "-"
+  },
+  {
+    "channel": "maxvaluemedia_spotpariz",
+    "slot": "spotpariz_true_mobile",
+    "time unit": "2026/01",
+    "total player impr": "3",
+    "total ad impr": "-",
+    "rpm": "-",
+    "gross revenue (usd)": "-",
+    "net revenue (usd)": "-"
+  }
+]
