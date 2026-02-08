@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Assignment - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Gliacloud</h1>
+            <div class="flex items-center gap-4">
+                <span class="text-emerald-100 text-sm">{% if user %}{{ user.username }}{% if user.role == 'admin' %} (admin){% endif %}{% endif %}</span>
+                <a href="/logout" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-medium transition-colors">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nav menu -->
+    <div class="container mx-auto px-6 py-2 flex gap-4 border-b bg-white shadow-sm text-sm">
+        <a href="/data" class="text-gray-600 hover:text-emerald-600">Data</a>
+        {% if user and user.role == 'admin' %}
+        <a href="/users" class="text-gray-600 hover:text-emerald-600">Users</a>
+        <a href="/slot-assignments" class="font-semibold text-emerald-600">Slot Assignment</a>
+        <a href="/shares" class="text-gray-600 hover:text-emerald-600">Share Config</a>
+        {% endif %}
+        <a href="/api-docs" class="text-gray-600 hover:text-emerald-600">API Docs</a>
+    </div>
+
+    <div class="container mx-auto px-6 py-6">
+        {% if success %}
+        <div class="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-sm">✅ Slot assignments updated successfully.</div>
+        {% endif %}
+
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900">Slot Assignment</h2>
+                <p class="text-sm text-gray-500 mt-1">Assign each site/slot to a user. Each slot can only belong to 1 user.</p>
+            </div>
+        </div>
+
+        <form method="post" action="/slot-assignments">
+            <input type="hidden" name="current_page" value="{{ page }}">
+            {% for slot in all_slots %}
+            <input type="hidden" name="page_slots" value="{{ slot }}">
+            {% endfor %}
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Site</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">User</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for slot in all_slots %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ slot }}</td>
+                            <td class="px-6 py-3">
+                                <select name="slot_{{ slot }}"
+                                    class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 min-w-[180px]">
+                                    <option value="">— Unassigned —</option>
+                                    {% for u in all_users %}
+                                    <option value="{{ u.id }}" {% if slot_user_map.get(slot) == u.id %}selected{% endif %}>{{ u.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not all_slots %}
+                        <tr>
+                            <td colspan="2" class="px-6 py-8 text-center text-gray-400">No slots found. Data needs to be crawled first.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            {% if all_slots %}
+            <div class="flex items-center justify-between mb-4">
+                <button type="submit" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl transition-colors text-sm">
+                    Save All
+                </button>
+                {% if total_pages and total_pages > 1 %}
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-600">{{ total_count }} slots</span>
+                    <div class="flex items-center gap-1">
+                        {% if page > 1 %}
+                        <a href="/slot-assignments?page={{ page - 1 }}" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium">Previous</a>
+                        {% endif %}
+                        {% for p in range(1, total_pages + 1) %}
+                        <a href="/slot-assignments?page={{ p }}" class="min-w-[2rem] px-2 py-1.5 rounded text-sm font-medium text-center {% if p == page %}bg-emerald-500 text-white{% else %}bg-gray-100 hover:bg-gray-200 text-gray-700{% endif %}">{{ p }}</a>
+                        {% endfor %}
+                        {% if page < total_pages %}
+                        <a href="/slot-assignments?page={{ page + 1 }}" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium">Next</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>
+

@@ -8,7 +8,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
-from crawler.db import RawRevenueData, ProcessedRevenueData
+from crawler.db import RawRevenueData, ProcessedRevenueData, get_share_for_slot
 
 
 def parse_numeric(value) -> Decimal:
@@ -55,7 +55,6 @@ def process_revenue_data(db: Session, target_date: date) -> dict:
             grouped[key]['true_mobile'] = row
 
     records_processed = records_created = records_updated = 0
-    share = Decimal('50.00')
     pairs = [
         ('desktop', 'mobile', lambda g: g['slot']),
         ('news_desktop', 'news_mobile', lambda g: f"{g['slot']}_news"),
@@ -70,6 +69,8 @@ def process_revenue_data(db: Session, target_date: date) -> dict:
             if not desktop_row and not mobile_row:
                 continue
             slot_name = slot_fn(group_data)
+            # Dynamic share lookup per slot + date
+            share = get_share_for_slot(db, slot_name, target_date)
             total_player_impr = parse_numeric(desktop_row.total_player_impr if desktop_row else '0') + parse_numeric(mobile_row.total_player_impr if mobile_row else '0')
             total_revenue = parse_numeric(desktop_row.net_revenue_usd if desktop_row else '0') + parse_numeric(mobile_row.net_revenue_usd if mobile_row else '0')
             rpm = (total_revenue / total_player_impr * Decimal('1000')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP) if total_player_impr > 0 else Decimal('0')

@@ -151,8 +151,12 @@ def process_revenue_data(db: Session, target_date: date) -> Dict:
                 rpm = (total_revenue / total_player_impr) * Decimal('1000')
                 rpm = rpm.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
             
-            # Share = 50%
-            share = Decimal('50.00')
+            # Dynamic share lookup per slot + date
+            try:
+                from crawler.db import get_share_for_slot
+                share = get_share_for_slot(db, slot_name, target_date)
+            except ImportError:
+                share = Decimal('50.00')
             
             # Total player IMPR 2 = Total player IMPR
             total_player_impr_2 = total_player_impr

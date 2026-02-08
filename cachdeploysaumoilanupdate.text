@@ -1,5 +1,6 @@
-   ./deploy-to-vps.sh
-cd /Users/lequel/Downloads/toolgetdata# 
+./deploy-to-vps.sh
+
+cd /Users/lequel/Downloads/toolgetdata#
 
 scp -P 22 api-image.tar crawler-image.tar root@103.37.60.86:/srv/toolgetdata/
 
@@ -22,3 +23,12 @@ docker-compose -f docker-compose.vps.yml up -d
 
 docker-compose -f docker-compose.vps.yml ps
 curl http://localhost:8000/health
+
+
+Push git
+
+git add .
+
+git commit -m "
+
+git push

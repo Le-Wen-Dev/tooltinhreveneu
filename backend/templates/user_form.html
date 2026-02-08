@@ -7,18 +7,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
     <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">{% if edit_user %}Edit User{% else %}New User{% endif %}</h1>
-            <div class="flex items-center gap-3">
-                <span class="text-emerald-100 text-sm">{% if user %}{{ user.username }} (admin){% endif %}</span>
+            <h1 class="text-3xl font-bold">Gliacloud</h1>
+            <div class="flex items-center gap-4">
+                <span class="text-emerald-100 text-sm">{% if user %}{{ user.username }}{% if user.role == 'admin' %} (admin){% endif %}{% endif %}</span>
                 <a href="/logout" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-medium transition-colors">Logout</a>
             </div>
         </div>
     </div>
-    <div class="container mx-auto px-6 py-4 flex gap-4 border-b bg-white shadow-sm">
-        <a href="/dashboard">Dashboard</a>
+
+    <!-- Nav menu -->
+    <div class="container mx-auto px-6 py-2 flex gap-4 border-b bg-white shadow-sm text-sm">
+        <a href="/data" class="text-gray-600 hover:text-emerald-600">Data</a>
+        {% if user and user.role == 'admin' %}
         <a href="/users" class="font-semibold text-emerald-600">Users</a>
+        <a href="/slot-assignments" class="text-gray-600 hover:text-emerald-600">Slot Assignment</a>
+        <a href="/shares" class="text-gray-600 hover:text-emerald-600">Share Config</a>
+        {% endif %}
+        <a href="/api-docs" class="text-gray-600 hover:text-emerald-600">API Docs</a>
     </div>
     <div class="container mx-auto px-6 py-6 max-w-xl">
         {% if error %}
@@ -65,6 +73,34 @@
                 <a href="/users" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-xl transition-colors">Cancel</a>
             </div>
         </form>
+
+        {% if edit_user and all_processed_slots is defined %}
+        <!-- Slot Assignment Section -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mt-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Assigned Slots</h3>
+            <p class="text-sm text-gray-500 mb-4">Select which slots this user can see. Each slot can only be assigned to 1 user. 🔒 = assigned to another user.</p>
+            <form method="post" action="/users/{{ edit_user.id }}/slots">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                    {% for s in all_processed_slots %}
+                    {% set is_mine = s in user_assigned_slot_names %}
+                    {% set owner = slot_owner_map.get(s) %}
+                    {% set is_taken = owner and not is_mine %}
+                    <label class="flex items-center gap-2 p-2 rounded-lg {% if is_taken %}bg-gray-100 text-gray-400{% else %}hover:bg-emerald-50{% endif %}">
+                        <input type="checkbox" name="slots" value="{{ s }}"
+                            {% if is_mine %}checked{% endif %}
+                            {% if is_taken %}disabled{% endif %}
+                            class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                        <span class="text-sm">{{ s }}</span>
+                        {% if is_taken %}
+                        <span class="text-xs text-gray-400 ml-auto">🔒 {{ owner }}</span>
+                        {% endif %}
+                    </label>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl transition-colors text-sm">Save Slots</button>
+            </form>
+        </div>
+        {% endif %}
     </div>
 </body>
 </html>

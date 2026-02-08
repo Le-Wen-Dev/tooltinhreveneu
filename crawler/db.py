@@ -3,7 +3,7 @@ Database connection and models for crawler
 """
 
 import os
-from sqlalchemy import create_engine, Column, Integer, String, Numeric, Boolean, DateTime, Date, Text, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Numeric, Boolean, DateTime, Date, Text, ForeignKey, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, relationship
 from sqlalchemy.dialects.mysql import JSON as MySQLJSON
@@ -165,6 +165,34 @@ class User(Base):
     last_login = Column(DateTime, nullable=True)
 
 
+class SlotShareConfig(Base):
+    """Config % share per processed slot with effective date."""
+    __tablename__ = "slot_share_config"
+
+    id = Column(Integer, primary_key=True, index=True)
+    slot = Column(String(255), nullable=False)
+    share_percent = Column(Numeric(5, 2), nullable=False)
+    effective_date = Column(Date, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    created_by = Column(String(255))
+
+    __table_args__ = (
+        UniqueConstraint('slot', 'effective_date', name='uq_slot_effective_date'),
+    )
+
+
+class UserSlot(Base):
+    """Assign processed slots to users. 1 slot = 1 user only."""
+    __tablename__ = "user_slots"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    slot = Column(String(255), nullable=False, unique=True)  # UNIQUE: 1 slot chỉ thuộc 1 user
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", backref="assigned_slots")
+
+
 # Dependency
 def get_db_session():
     db = SessionLocal()
@@ -172,6 +200,23 @@ def get_db_session():
         yield db
     finally:
         db.close()
+
+
+def get_share_for_slot(db: Session, slot: str, target_date) -> 'Decimal':
+    """
+    Lookup share % for a slot on a given date.
+    Uses effective_date logic: find the most recent config where effective_date <= target_date.
+    Falls back to 50% if no config found.
+    """
+    from decimal import Decimal
+    config = db.query(SlotShareConfig).filter(
+        SlotShareConfig.slot == slot,
+        SlotShareConfig.effective_date <= target_date
+    ).order_by(SlotShareConfig.effective_date.desc()).first()
+
+    if config:
+        return config.share_percent
+    return Decimal('50.00')
 
 
 # FormulaEngine sẽ được import trong main.py

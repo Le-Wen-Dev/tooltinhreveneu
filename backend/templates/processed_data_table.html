@@ -19,20 +19,28 @@
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <!-- Header: Gliacloud + (API Docs for user) + username + Logout -->
+    <!-- Header -->
     <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-3xl font-bold">{% if user and user.role != 'admin' %}Glia Dashboard{% else %}Gliacloud{% endif %}</h1>
+            <h1 class="text-3xl font-bold">Gliacloud</h1>
             <div class="flex items-center gap-4">
-                {% if user and user.role != 'admin' %}
-                <a href="{{ api_docs_url }}" target="_blank" rel="noopener" class="text-white hover:underline text-sm font-medium">API Docs</a>
-                {% endif %}
                 <span class="text-emerald-100 text-sm">{% if user %}{{ user.username }}{% if user.role == 'admin' %} (admin){% endif %}{% endif %}</span>
                 <a href="/logout" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-medium transition-colors">Logout</a>
             </div>
         </div>
     </div>
-    
+
+    <!-- Nav menu -->
+    <div class="container mx-auto px-6 py-2 flex gap-4 border-b bg-white shadow-sm text-sm">
+        <a href="/data" class="font-semibold text-emerald-600">Data</a>
+        {% if user and user.role == 'admin' %}
+        <a href="/users" class="text-gray-600 hover:text-emerald-600">Users</a>
+        <a href="/slot-assignments" class="text-gray-600 hover:text-emerald-600">Slot Assignment</a>
+        <a href="/shares" class="text-gray-600 hover:text-emerald-600">Share Config</a>
+        {% endif %}
+        <a href="/api-docs" class="text-gray-600 hover:text-emerald-600">API Docs</a>
+    </div>
+
     <div class="container mx-auto px-6 py-6">
         {% if user and user.role == 'admin' %}
         <!-- View Toggle + Trigger Crawl (admin): Dashboard | Raw Data | Trigger Crawl (Manual) -->

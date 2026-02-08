@@ -19,6 +19,9 @@ from crawler.db import (
     FetchLog,
     Formula,
     User,
+    SlotShareConfig,
+    UserSlot,
+    get_share_for_slot,
 )
 
 # Import processed data model
@@ -28,12 +31,12 @@ except ImportError:
     # Create model inline if import fails
     from sqlalchemy import Column, Integer, String, Numeric, DateTime, Date
     from sqlalchemy.ext.declarative import declarative_base
-    
+
     Base = declarative_base()
-    
+
     class ProcessedRevenueData(Base):
         __tablename__ = "processed_revenue_data"
-        
+
         id = Column(Integer, primary_key=True, index=True)
         slot = Column(String(255), nullable=False)
         time_unit = Column(String(50), nullable=False)
@@ -281,14 +284,14 @@ async def get_computed_metrics(
 ):
     """Get computed metrics (row-level)"""
     query = db.query(ComputedMetric)
-    
+
     if raw_data_id:
         query = query.filter(ComputedMetric.raw_data_id == raw_data_id)
     if formula_id:
         query = query.filter(ComputedMetric.formula_id == formula_id)
     if metric_name:
         query = query.filter(ComputedMetric.metric_name == metric_name)
-    
+
     results = query.limit(limit).all()
     return [
         {
@@ -314,7 +317,7 @@ async def get_aggregated_metrics(
 ):
     """Get aggregated metrics"""
     query = db.query(AggregatedMetric)
-    
+
     if channel:
         query = query.filter(AggregatedMetric.channel == channel)
     if time_unit:
@@ -323,7 +326,7 @@ async def get_aggregated_metrics(
         query = query.filter(AggregatedMetric.fetch_date == fetch_date)
     if metric_name:
         query = query.filter(AggregatedMetric.metric_name == metric_name)
-    
+
     results = query.order_by(AggregatedMetric.fetch_date.desc()).limit(limit).all()
     return [
         {
@@ -371,7 +374,7 @@ async def get_raw_data(
     from_d = _parse_optional_date(from_date)
     to_d = _parse_optional_date(to_date)
     query = db.query(RawRevenueData)
-    
+
     if fd:
         query = query.filter(RawRevenueData.fetch_date == fd)
     else:
@@ -381,7 +384,7 @@ async def get_raw_data(
             query = query.filter(RawRevenueData.fetch_date <= to_d)
     if channel:
         query = query.filter(RawRevenueData.channel == channel)
-    
+
     results = query.order_by(RawRevenueData.fetch_date.desc()).offset(offset).limit(limit).all()
     return [
         {
@@ -410,12 +413,12 @@ async def get_fetch_logs(
 ):
     """Get fetch logs (lịch sử fetch)"""
     query = db.query(FetchLog)
-    
+
     if fetch_date:
         query = query.filter(FetchLog.fetch_date == fetch_date)
     if status:
         query = query.filter(FetchLog.status == status)
-    
+
     results = query.order_by(FetchLog.started_at.desc()).limit(limit).all()
     return [
         {
@@ -444,7 +447,7 @@ async def get_formulas(
     query = db.query(Formula)
     if is_active is not None:
         query = query.filter(Formula.is_active == is_active)
-    
+
     results = query.all()
     return [
         {
@@ -477,9 +480,18 @@ async def get_processed_data(
     to_d = _parse_optional_date(to_date)
     if ProcessedRevenueData is None:
         raise HTTPException(status_code=503, detail="Processed data model not available")
-    
+
     query = db.query(ProcessedRevenueData)
-    
+    is_admin = getattr(user, "role", None) == "admin"
+
+    # Non-admin: filter by assigned slots only
+    if not is_admin:
+        allowed_slots = db.query(UserSlot.slot).filter(UserSlot.user_id == user.id).all()
+        allowed_slot_names = [s[0] for s in allowed_slots]
+        if not allowed_slot_names:
+            return []  # No assigned slots → no data
+        query = query.filter(ProcessedRevenueData.slot.in_(allowed_slot_names))
+
     if fd:
         query = query.filter(ProcessedRevenueData.fetch_date == fd)
     else:
@@ -489,9 +501,8 @@ async def get_processed_data(
             query = query.filter(ProcessedRevenueData.fetch_date <= to_d)
     if slot:
         query = query.filter(ProcessedRevenueData.slot == slot)
-    
+
     results = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).offset(offset).limit(limit).all()
-    is_admin = getattr(user, "role", None) == "admin"
 
     out = []
     for r in results:
@@ -538,45 +549,45 @@ async def trigger_crawl(
     if user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin only")
     global crawl_status
-    
+
     if crawl_status["running"]:
         return {
             "status": "error",
             "message": "Crawler is already running",
             "last_run": crawl_status["last_run"]
         }
-    
+
     def run_crawler(req: Optional[TriggerCrawlRequest]):
         global crawl_status
         try:
             crawl_status["running"] = True
             crawl_status["last_run"] = datetime.now().isoformat()
-            
+
             # Import data fetcher
             import sys
             from pathlib import Path
             sys.path.insert(0, str(Path(__file__).parent.parent))
-            
+
             from backend.data_fetcher import DataFetcher
             from datetime import date, timedelta
-            
+
             target_date = req.date if req and req.date else date.today() - timedelta(days=1)
             first_page_only = req.first_page_only if req else False
-            
+
             # Use DataFetcher instead of crawler.main
             fetcher = DataFetcher()
             result = fetcher.fetch_and_store(target_date=target_date, first_page_only=first_page_only)
             crawl_status["last_result"] = result
             crawl_status["running"] = False
-            
+
         except Exception as e:
             crawl_status["running"] = False
             crawl_status["last_result"] = {"status": "error", "error": str(e)}
-    
+
     # Run in background thread
     thread = threading.Thread(target=run_crawler, args=(request,), daemon=True)
     thread.start()
-    
+
     return {
         "status": "started",
         "message": "Crawler started in background",
@@ -696,18 +707,9 @@ async def register_submit(
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
-async def admin_dashboard(request: Request, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    if not isinstance(user, User):
-        return user
-    if user.role != "admin":
-        return RedirectResponse(url="/data", status_code=302)
-    """Admin dashboard"""
-    formulas = db.query(Formula).all()
-    return templates.TemplateResponse("admin_dashboard.html", {
-        "request": request,
-        "formulas": formulas,
-        "user": user,
-    })
+async def admin_dashboard(request: Request):
+    """Dashboard now redirects to /data (Data Table is the main page)."""
+    return RedirectResponse(url="/data", status_code=302)
 
 
 @app.get("/admin", response_class=HTMLResponse)
@@ -748,7 +750,7 @@ async def edit_formula_form(request: Request, formula_id: int, db: Session = Dep
     formula = db.query(Formula).filter(Formula.id == formula_id).first()
     if not formula:
         raise HTTPException(status_code=404, detail="Formula not found")
-    
+
     return templates.TemplateResponse("formula_form.html", {
         "request": request,
         "formula": formula,
@@ -780,7 +782,7 @@ async def create_formula(
     db.add(formula)
     db.commit()
     db.refresh(formula)
-    
+
     return RedirectResponse(url="/formulas", status_code=303)
 
 @app.post("/formulas/{formula_id}")
@@ -801,16 +803,16 @@ async def update_formula(
     formula = db.query(Formula).filter(Formula.id == formula_id).first()
     if not formula:
         raise HTTPException(status_code=404, detail="Formula not found")
-    
+
     formula.name = name
     formula.description = description
     formula.formula_expression = formula_expression
     formula.formula_type = formula_type
     formula.is_active = is_active
     formula.updated_at = datetime.utcnow()
-    
+
     db.commit()
-    
+
     return RedirectResponse(url="/formulas", status_code=303)
 
 @app.post("/formulas/{formula_id}/compute")
@@ -826,7 +828,7 @@ async def compute_formula_endpoint(
     from backend.formula_engine import FormulaEngine
     engine = FormulaEngine(db)
     result = engine.compute_formula(formula_id)
-    
+
     return RedirectResponse(
         url=f"/formulas?computed={formula_id}",
         status_code=303
@@ -845,10 +847,10 @@ async def delete_formula_endpoint(
     formula = db.query(Formula).filter(Formula.id == formula_id).first()
     if not formula:
         raise HTTPException(status_code=404, detail="Formula not found")
-    
+
     formula.is_active = False
     db.commit()
-    
+
     return RedirectResponse(url="/formulas", status_code=303)
 
 
@@ -858,13 +860,18 @@ async def list_users(request: Request, db: Session = Depends(get_db), user: User
     if not isinstance(user, User):
         return user
     users = db.query(User).order_by(User.created_at.desc()).all()
-    return templates.TemplateResponse("users_list.html", {"request": request, "users": users, "user": user})
+    # Get slot assignments for all users
+    all_assignments = db.query(UserSlot).all()
+    user_slots_map = {}
+    for a in all_assignments:
+        user_slots_map.setdefault(a.user_id, []).append(a.slot)
+    return templates.TemplateResponse("users_list.html", {"request": request, "users": users, "user": user, "user_slots_map": user_slots_map})
 
 @app.get("/users/new", response_class=HTMLResponse)
 async def new_user_form(request: Request, user: User = Depends(require_admin)):
     if not isinstance(user, User):
         return user
-    return templates.TemplateResponse("user_form.html", {"request": request, "edit_user": None})
+    return templates.TemplateResponse("user_form.html", {"request": request, "edit_user": None, "user": user})
 
 @app.post("/users")
 async def create_user(
@@ -880,9 +887,9 @@ async def create_user(
     if not isinstance(user, User):
         return user
     if db.query(User).filter(User.username == username).first():
-        return templates.TemplateResponse("user_form.html", {"request": request, "edit_user": None, "error": "Username already exists"})
+        return templates.TemplateResponse("user_form.html", {"request": request, "edit_user": None, "error": "Username already exists", "user": user})
     if db.query(User).filter(User.email == email).first():
-        return templates.TemplateResponse("user_form.html", {"request": request, "edit_user": None, "error": "Email already registered"})
+        return templates.TemplateResponse("user_form.html", {"request": request, "edit_user": None, "error": "Email already registered", "user": user})
     new_user = User(
         username=username,
         email=email,
@@ -902,7 +909,22 @@ async def edit_user_form(request: Request, user_id: int, db: Session = Depends(g
     edit_user = db.query(User).filter(User.id == user_id).first()
     if not edit_user:
         raise HTTPException(status_code=404, detail="User not found")
-    return templates.TemplateResponse("user_form.html", {"request": request, "edit_user": edit_user})
+    # Get all processed slots + current assignments for slot assignment UI
+    all_processed_slots = db.query(ProcessedRevenueData.slot).distinct().order_by(ProcessedRevenueData.slot).all()
+    all_processed_slots = [s[0] for s in all_processed_slots]
+    user_assigned_slots = db.query(UserSlot).filter(UserSlot.user_id == user_id).all()
+    user_assigned_slot_names = {a.slot for a in user_assigned_slots}
+    # Get all slot assignments (to show which slots are taken by other users)
+    all_assignments = db.query(UserSlot).all()
+    slot_owner_map = {a.slot: a.user.username if a.user else str(a.user_id) for a in all_assignments}
+    return templates.TemplateResponse("user_form.html", {
+        "request": request,
+        "user": user,
+        "edit_user": edit_user,
+        "all_processed_slots": all_processed_slots,
+        "user_assigned_slot_names": user_assigned_slot_names,
+        "slot_owner_map": slot_owner_map,
+    })
 
 @app.post("/users/{user_id}")
 async def update_user(
@@ -950,6 +972,187 @@ async def delete_user(request: Request, user_id: int, db: Session = Depends(get_
     edit_user.is_active = False
     db.commit()
     return RedirectResponse(url="/users", status_code=303)
+
+
+# ----- Share Config CRUD (admin only) -----
+@app.get("/shares", response_class=HTMLResponse)
+async def list_shares(request: Request, db: Session = Depends(get_db), user: User = Depends(require_admin)):
+    if not isinstance(user, User):
+        return user
+    configs = db.query(SlotShareConfig).order_by(SlotShareConfig.slot, SlotShareConfig.effective_date.desc()).all()
+    # Get all available processed slots for the dropdown
+    available_slots = db.query(ProcessedRevenueData.slot).distinct().order_by(ProcessedRevenueData.slot).all()
+    available_slots = [s[0] for s in available_slots]
+    return templates.TemplateResponse("shares.html", {
+        "request": request,
+        "configs": configs,
+        "available_slots": available_slots,
+        "user": user,
+    })
+
+@app.post("/shares")
+async def create_share(
+    request: Request,
+    slot: str = Form(...),
+    share_percent: str = Form(...),
+    effective_date: str = Form(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(require_admin),
+):
+    if not isinstance(user, User):
+        return user
+    from decimal import Decimal
+    try:
+        sp = Decimal(share_percent)
+        ed = datetime.strptime(effective_date, "%Y-%m-%d").date()
+    except (ValueError, Exception):
+        return RedirectResponse(url="/shares?error=invalid_input", status_code=303)
+    # Check if config already exists for this slot + date
+    existing = db.query(SlotShareConfig).filter(
+        SlotShareConfig.slot == slot,
+        SlotShareConfig.effective_date == ed
+    ).first()
+    if existing:
+        existing.share_percent = sp
+        existing.created_by = user.username
+    else:
+        config = SlotShareConfig(
+            slot=slot,
+            share_percent=sp,
+            effective_date=ed,
+            created_by=user.username,
+        )
+        db.add(config)
+    db.commit()
+    return RedirectResponse(url="/shares", status_code=303)
+
+@app.post("/shares/{config_id}/delete")
+async def delete_share(request: Request, config_id: int, db: Session = Depends(get_db), user: User = Depends(require_admin)):
+    if not isinstance(user, User):
+        return user
+    config = db.query(SlotShareConfig).filter(SlotShareConfig.id == config_id).first()
+    if config:
+        db.delete(config)
+        db.commit()
+    return RedirectResponse(url="/shares", status_code=303)
+
+
+# ----- User Slot Assignment (admin only, integrated into user edit) -----
+@app.post("/users/{user_id}/slots")
+async def update_user_slots(
+    request: Request,
+    user_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_admin),
+):
+    """Update slot assignments for a user. Receives form with slot checkboxes."""
+    if not isinstance(user, User):
+        return user
+    edit_user = db.query(User).filter(User.id == user_id).first()
+    if not edit_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    form_data = await request.form()
+    selected_slots = form_data.getlist("slots")
+
+    # Get current assignments for this user
+    current_assignments = db.query(UserSlot).filter(UserSlot.user_id == user_id).all()
+    current_slot_names = {a.slot for a in current_assignments}
+
+    # Slots to add
+    for slot_name in selected_slots:
+        if slot_name not in current_slot_names:
+            # Check if slot is already assigned to another user
+            existing = db.query(UserSlot).filter(UserSlot.slot == slot_name).first()
+            if existing and existing.user_id != user_id:
+                # Slot belongs to another user — skip (UI should prevent this)
+                continue
+            if not existing:
+                db.add(UserSlot(user_id=user_id, slot=slot_name))
+
+    # Slots to remove (were assigned to this user but no longer selected)
+    for assignment in current_assignments:
+        if assignment.slot not in selected_slots:
+            db.delete(assignment)
+
+    db.commit()
+    return RedirectResponse(url=f"/users/{user_id}/edit", status_code=303)
+
+
+# ----- Slot Assignment Overview (admin only) -----
+SLOT_PAGE_SIZE = 5
+
+@app.get("/slot-assignments", response_class=HTMLResponse)
+async def slot_assignments_page(request: Request, db: Session = Depends(get_db), user: User = Depends(require_admin)):
+    if not isinstance(user, User):
+        return user
+    # Pagination
+    page = int(request.query_params.get("page", 1))
+    if page < 1:
+        page = 1
+    # Get all distinct processed slots
+    all_slots_q = db.query(ProcessedRevenueData.slot).distinct().order_by(ProcessedRevenueData.slot).all()
+    all_slot_names = [s[0] for s in all_slots_q]
+    total_count = len(all_slot_names)
+    total_pages = max(1, (total_count + SLOT_PAGE_SIZE - 1) // SLOT_PAGE_SIZE)
+    if page > total_pages:
+        page = total_pages
+    page_slots = all_slot_names[(page - 1) * SLOT_PAGE_SIZE : page * SLOT_PAGE_SIZE]
+    # Get all active users for dropdown
+    all_users = db.query(User).filter(User.is_active == True).order_by(User.username).all()
+    # Build slot -> user_id map from current assignments
+    all_assignments = db.query(UserSlot).all()
+    slot_user_map = {a.slot: a.user_id for a in all_assignments}
+    success = request.query_params.get("success")
+    return templates.TemplateResponse("slot_assignments.html", {
+        "request": request,
+        "user": user,
+        "all_slots": page_slots,
+        "all_users": all_users,
+        "slot_user_map": slot_user_map,
+        "success": success,
+        "page": page,
+        "total_pages": total_pages,
+        "total_count": total_count,
+    })
+
+@app.post("/slot-assignments")
+async def save_slot_assignments(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_admin),
+):
+    """Save slot assignments for the current page only."""
+    if not isinstance(user, User):
+        return user
+    form_data = await request.form()
+    current_page = int(form_data.get("current_page", 1))
+
+    # Get the slot names submitted in the form (hidden inputs)
+    page_slot_names = form_data.getlist("page_slots")
+
+    # Get current assignments
+    current_assignments = db.query(UserSlot).all()
+    current_map = {a.slot: a for a in current_assignments}
+
+    for slot_name in page_slot_names:
+        selected_user_id = form_data.get(f"slot_{slot_name}", "")
+        current_assignment = current_map.get(slot_name)
+
+        if selected_user_id == "" or selected_user_id is None:
+            # Unassign: remove if exists
+            if current_assignment:
+                db.delete(current_assignment)
+        else:
+            user_id = int(selected_user_id)
+            if current_assignment:
+                if current_assignment.user_id != user_id:
+                    current_assignment.user_id = user_id
+            else:
+                db.add(UserSlot(user_id=user_id, slot=slot_name))
+
+    db.commit()
+    return RedirectResponse(url=f"/slot-assignments?page={current_page}&success=1", status_code=303)
 
 
 @app.get("/api-docs", response_class=HTMLResponse)
@@ -1029,9 +1232,37 @@ async def view_data(
     from_d = _parse_optional_date(from_date)
     to_d = _parse_optional_date(to_date)
 
+    is_admin = getattr(user, "role", None) == "admin"
+
     if view_type == "datafull" and ProcessedRevenueData:
         query = db.query(ProcessedRevenueData)
-        
+
+        # Non-admin: filter by assigned slots only
+        if not is_admin:
+            allowed_slots = db.query(UserSlot.slot).filter(UserSlot.user_id == user.id).all()
+            allowed_slot_names = [s[0] for s in allowed_slots]
+            if not allowed_slot_names:
+                # No assigned slots → show empty page
+                return templates.TemplateResponse("processed_data_table.html", {
+                    "request": request,
+                    "data": [],
+                    "available_dates": [],
+                    "available_slots": [],
+                    "current_date": fd,
+                    "from_date": from_d,
+                    "to_date": to_d,
+                    "current_slot": slot,
+                    "view_type": "datafull",
+                    "user": user,
+                    "page": 1,
+                    "total_pages": 1,
+                    "total_count": 0,
+                    "page_size": PAGE_SIZE,
+                    "base_url": BASE_URL,
+                    "api_docs_url": API_DOCS_URL,
+                })
+            query = query.filter(ProcessedRevenueData.slot.in_(allowed_slot_names))
+
         if fd:
             query = query.filter(ProcessedRevenueData.fetch_date == fd)
         else:
@@ -1041,7 +1272,7 @@ async def view_data(
                 query = query.filter(ProcessedRevenueData.fetch_date <= to_d)
         if slot:
             query = query.filter(ProcessedRevenueData.slot == slot)
-        
+
         total_count = query.count()
         total_pages = max(1, (total_count + PAGE_SIZE - 1) // PAGE_SIZE)
         page = min(page, total_pages)
@@ -1049,9 +1280,13 @@ async def view_data(
         data = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).offset(offset).limit(PAGE_SIZE).all()
         available_dates = db.query(ProcessedRevenueData.fetch_date).distinct().order_by(ProcessedRevenueData.fetch_date.desc()).limit(365).all()
         available_dates = [d[0] for d in available_dates]
-        available_slots = db.query(ProcessedRevenueData.slot).distinct().order_by(ProcessedRevenueData.slot).all()
-        available_slots = [s[0] for s in available_slots]
-        
+        # Available slots dropdown: also filtered for non-admin
+        if is_admin:
+            available_slots = db.query(ProcessedRevenueData.slot).distinct().order_by(ProcessedRevenueData.slot).all()
+            available_slots = [s[0] for s in available_slots]
+        else:
+            available_slots = allowed_slot_names
+
         return templates.TemplateResponse("processed_data_table.html", {
             "request": request,
             "data": data,
@@ -1072,7 +1307,7 @@ async def view_data(
         })
     else:
         query = db.query(RawRevenueData)
-        
+
         if fd:
             query = query.filter(RawRevenueData.fetch_date == fd)
         else:
@@ -1084,7 +1319,7 @@ async def view_data(
             query = query.filter(RawRevenueData.channel == channel)
         if slot:
             query = query.filter(RawRevenueData.slot == slot)
-        
+
         total_count = query.count()
         total_pages = max(1, (total_count + PAGE_SIZE - 1) // PAGE_SIZE)
         page = min(page, total_pages)
@@ -1094,7 +1329,7 @@ async def view_data(
         available_dates = [d[0] for d in available_dates]
         available_slots_raw = db.query(RawRevenueData.slot).distinct().order_by(RawRevenueData.slot).all()
         available_slots_raw = [s[0] for s in available_slots_raw]
-        
+
         return templates.TemplateResponse("data_table.html", {
             "request": request,
             "data": data,

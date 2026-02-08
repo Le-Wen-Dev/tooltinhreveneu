@@ -1,0 +1,122 @@
+=============================================
+TÀI LIỆU CẬP NHẬT - 09/02/2026
+TEMPLATE CHO CÁC ĐỢT UPDATE SAU
+=============================================
+
+=== A. NHỮNG VIỆC ĐÃ LÀM Ở LOCAL ===
+
+1. Trang Slot Assignment mới (/slot-assignments)
+   - Tạo file: backend/templates/slot_assignments.html
+   - Thêm 2 route GET/POST trong api/main.py
+   - Hiển thị bảng Site | User (dropdown) thay cho checkbox grid cũ
+   - Phân trang 5 record/trang, style giống bảng raw data
+
+2. Sửa hiển thị Share %
+   - File: backend/templates/shares.html
+   - Đổi step="0.01" → step="1", value="50.00" → value="50"
+   - Dùng {{ c.share_percent|int }}% để hiển thị 57% thay vì 57.00%
+   - DB vẫn giữ Numeric(5,2), chỉ sửa HTML
+
+3. Fix nav menu trang Edit User
+   - File: api/main.py (3 chỗ: new_user_form, create_user error, edit_user_form)
+   - Thêm "user": user vào TemplateResponse context
+   - Nguyên nhân: template cần biến user để hiển thị menu theo role
+
+4. Cập nhật nav menu tất cả template
+   - Thêm link "Slot Assignment" vào giữa Users và Share Config
+   - Files: processed_data_table.html, data_table.html, users_list.html,
+     shares.html, user_form.html, api_docs.html, slot_assignments.html
+
+=== B. NHỮNG VIỆC ĐÃ TEST Ở LOCAL ===
+
+1. ✅ Trang /slot-assignments hiển thị đúng bảng, dropdown, phân trang
+2. ✅ Assign/unassign slot cho user hoạt động đúng
+3. ✅ Phân trang chỉ update slot trên trang hiện tại (không ảnh hưởng trang khác)
+4. ✅ Share % hiển thị số nguyên (57% thay vì 57.00%)
+5. ✅ Nav menu hiển thị đầy đủ trên tất cả trang (kể cả Edit User)
+6. ✅ Menu active state đúng cho từng trang
+7. ✅ Role user không thấy menu admin
+8. ✅ Health check OK: curl http://localhost:8000/health
+
+=== C. NHỮNG GÌ ĐÃ UPDATE LÊN PRODUCTION ===
+
+1. Build image mới (linux/amd64):
+   ./deploy-to-vps.sh
+
+2. Upload lên VPS:
+   scp -P 22 api-image.tar crawler-image.tar root@103.37.60.86:/srv/toolgetdata/
+   scp -P 22 docker-compose.vps.yml database_schema_complete.sql migrations_add_users_table.sql seed_users.sql run-crawler.sh root@103.37.60.86:/srv/toolgetdata/
+   scp -P 22 .env root@103.37.60.86:/srv/toolgetdata/
+
+3. Trên VPS - Load image + restart:
+   docker load -i api-image.tar
+   docker load -i crawler-image.tar
+   docker-compose -f docker-compose.vps.yml down
+   docker-compose -f docker-compose.vps.yml up -d
+
+4. Trên VPS - Chạy SQL tạo bảng thiếu:
+   docker exec -i toolgetdata_db_1 mysql -u tooltinhreveneu_1 -p'tooltinhreveneu@gndhsggkl' tooltinhreveneu_1 < /srv/toolgetdata/database_schema_complete.sql
+
+5. Seed users:
+   docker exec -i toolgetdata_db_1 mysql -u tooltinhreveneu_1 -p'tooltinhreveneu@gndhsggkl' tooltinhreveneu_1 < /srv/toolgetdata/seed_users.sql
+
+=== D. NHỮNG LỖI ĐÃ GẶP - TRÁNH LẦN SAU ===
+
+LỖI 1: Upload image nhưng quên load + restart
+   Triệu chứng: scp xong nhưng browser vẫn hiện bản cũ
+   Nguyên nhân: Chỉ upload file .tar lên VPS, chưa chạy docker load và docker-compose up
+   Cách tránh: SAU KHI scp xong, PHẢI SSH vào VPS chạy docker load + docker-compose down/up
+
+LỖI 2: Load image cũ trước khi build image mới
+   Triệu chứng: docker images | grep toolgetdata hiện "9 days ago"
+   Nguyên nhân: SSH vào VPS chạy docker load TRƯỚC KHI build image mới ở local
+   Cách tránh: LUÔN build trước (./deploy-to-vps.sh) → scp upload → rồi mới SSH vào load
+
+LỖI 3: Quên upload file .tar (chỉ upload .yml, .sql, .env)
+   Triệu chứng: docker images vẫn hiện image cũ sau khi docker load
+   Nguyên nhân: Lệnh scp không bao gồm api-image.tar và crawler-image.tar
+   Cách tránh: Kiểm tra lệnh scp có đủ 2 file: api-image.tar, crawler-image.tar
+
+LỖI 4: DB production thiếu bảng (Internal Server Error)
+   Triệu chứng: Tất cả trang trừ /data bị lỗi 500
+   Log: "Table 'tooltinhreveneu_1.user_slots' doesn't exist"
+   Nguyên nhân: Code dùng bảng user_slots, slot_share_config nhưng DB production chưa tạo
+   Cách tránh: Nếu code dùng bảng mới → PHẢI chạy SQL tạo bảng trên production
+   Lệnh: docker exec -i toolgetdata_db_1 mysql -u tooltinhreveneu_1 -p'tooltinhreveneu@gndhsggkl' tooltinhreveneu_1 < database_schema_complete.sql
+
+LỖI 5: Sai password MySQL
+   Triệu chứng: ERROR 1045 Access denied for user 'root'@'localhost'
+   Nguyên nhân: Dùng user root thay vì user trong .env, hoặc password sai
+   Cách tránh: LUÔN dùng user/pass từ file .env trên VPS
+   Lệnh đúng: docker exec -i toolgetdata_db_1 mysql -u tooltinhreveneu_1 -p'tooltinhreveneu@gndhsggkl' tooltinhreveneu_1
+   Lưu ý: -p viết LIỀN password, password có ký tự @ phải bọc trong dấu nháy đơn '...'
+
+=== E. CHECKLIST DEPLOY - DÙNG CHO MỖI LẦN UPDATE ===
+
+TRÊN MÁY LOCAL:
+[ ] 1. Code đã sửa xong và test local OK
+[ ] 2. Chạy: ./deploy-to-vps.sh (build image linux/amd64)
+[ ] 3. Upload IMAGE: scp -P 22 api-image.tar crawler-image.tar root@103.37.60.86:/srv/toolgetdata/
+[ ] 4. Upload CONFIG: scp -P 22 docker-compose.vps.yml database_schema_complete.sql seed_users.sql root@103.37.60.86:/srv/toolgetdata/
+[ ] 5. Upload ENV (nếu thay đổi): scp -P 22 .env root@103.37.60.86:/srv/toolgetdata/
+
+TRÊN VPS (ssh root@103.37.60.86):
+[ ] 6. cd /srv/toolgetdata
+[ ] 7. docker load -i api-image.tar
+[ ] 8. docker load -i crawler-image.tar
+[ ] 9. Kiểm tra image mới: docker images | grep toolgetdata (phải thấy "seconds ago")
+[ ] 10. docker-compose -f docker-compose.vps.yml down
+[ ] 11. docker-compose -f docker-compose.vps.yml up -d
+[ ] 12. (Nếu có bảng/cột mới) Chạy SQL migration
+[ ] 13. docker-compose -f docker-compose.vps.yml ps (tất cả Up)
+[ ] 14. curl http://localhost:8000/health (phải trả {"status":"healthy"})
+
+TRÊN BROWSER:
+[ ] 15. Hard refresh Cmd+Shift+R trang https://beta.gliacloud.online
+[ ] 16. Kiểm tra các trang mới/sửa hoạt động đúng
+[ ] 17. Kiểm tra log nếu lỗi: docker-compose -f docker-compose.vps.yml logs --tail=100 api
+
+PUSH GIT:
+[ ] 18. git add .
+[ ] 19. git commit -m "Mô tả update"
+[ ] 20. git push
