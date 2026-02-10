@@ -109,6 +109,7 @@
                             <th class="px-6 py-3 text-right text-xs font-semibold text-white uppercase tracking-wider">Total Player IMPR</th>
                             <th class="px-6 py-3 text-right text-xs font-semibold text-white uppercase tracking-wider">Revenue</th>
                             <th class="px-6 py-3 text-right text-xs font-semibold text-white uppercase tracking-wider">RPM</th>
+                            <th class="px-6 py-3 text-center text-xs font-semibold text-white uppercase tracking-wider">Share</th>
                             {% if user and user.role == 'admin' %}
                             <th class="px-6 py-3 text-right text-xs font-semibold text-white uppercase tracking-wider">Total Player IMPR 2</th>
                             <th class="px-6 py-3 text-right text-xs font-semibold text-white uppercase tracking-wider">Revenue 2</th>
@@ -124,6 +125,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{% if user and user.role != 'admin' %}{{ "{:,.0f}".format(row.total_player_impr_2) if row.total_player_impr_2 else '-' }}{% else %}{{ "{:,.0f}".format(row.total_player_impr) if row.total_player_impr else '-' }}{% endif %}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-emerald-600">{% if user and user.role != 'admin' %}{{ "${:,.2f}".format(row.revenue_2) if row.revenue_2 else '-' }}{% else %}{{ "${:,.2f}".format(row.revenue) if row.revenue else '-' }}{% endif %}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{% if user and user.role != 'admin' %}{{ "{:.2f}".format(row.rpm_2) if row.rpm_2 else '-' }}{% else %}{{ "{:.2f}".format(row.rpm) if row.rpm else '-' }}{% endif %}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">{{ row.share|int }}%</span>
+                            </td>
                             {% if user and user.role == 'admin' %}
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ "{:,.0f}".format(row.total_player_impr_2) if row.total_player_impr_2 else '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-emerald-600">{{ "${:,.2f}".format(row.revenue_2) if row.revenue_2 else '-' }}</td>

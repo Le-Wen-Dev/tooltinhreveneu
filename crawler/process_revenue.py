@@ -105,3 +105,68 @@ def process_revenue_data(db: Session, target_date: date) -> dict:
             records_processed += 1
 
     return {"status": "success", "records_processed": records_processed, "records_created": records_created, "records_updated": records_updated}
+
+
+def recalculate_processed_data_for_slot(db: Session, slot: str, from_date: date = None) -> dict:
+    """
+    Recalculate revenue_2, rpm_2 for a slot when share config changes.
+    If from_date is provided, only recalculate records from that date onwards.
+    Otherwise recalculate all records for the slot.
+    """
+    query = db.query(ProcessedRevenueData).filter(ProcessedRevenueData.slot == slot)
+    if from_date:
+        query = query.filter(ProcessedRevenueData.fetch_date >= from_date)
+
+    records = query.all()
+    records_updated = 0
+
+    for record in records:
+        # Lookup current share for this slot + date
+        share = get_share_for_slot(db, slot, record.fetch_date)
+
+        # Recalculate revenue_2 and rpm_2
+        revenue_2 = (record.revenue * (share / Decimal('100'))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        rpm_2 = Decimal('0')
+        if record.total_player_impr_2 and record.total_player_impr_2 > 0:
+            rpm_2 = (revenue_2 / record.total_player_impr_2 * Decimal('1000')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+        # Update record
+        record.share = share
+        record.revenue_2 = revenue_2
+        record.rpm_2 = rpm_2
+        records_updated += 1
+
+    db.commit()
+    return {"status": "success", "slot": slot, "records_updated": records_updated}
+
+
+def recalculate_all_slots(db: Session, from_date: date = None) -> dict:
+    """
+    Recalculate revenue_2, rpm_2 for ALL slots when global share config changes.
+    If from_date is provided, only recalculate records from that date onwards.
+    """
+    query = db.query(ProcessedRevenueData)
+    if from_date:
+        query = query.filter(ProcessedRevenueData.fetch_date >= from_date)
+
+    records = query.all()
+    records_updated = 0
+
+    for record in records:
+        # Lookup current share for this slot + date (will use global "*" if no specific config)
+        share = get_share_for_slot(db, record.slot, record.fetch_date)
+
+        # Recalculate revenue_2 and rpm_2
+        revenue_2 = (record.revenue * (share / Decimal('100'))).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        rpm_2 = Decimal('0')
+        if record.total_player_impr_2 and record.total_player_impr_2 > 0:
+            rpm_2 = (revenue_2 / record.total_player_impr_2 * Decimal('1000')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+        # Update record
+        record.share = share
+        record.revenue_2 = revenue_2
+        record.rpm_2 = rpm_2
+        records_updated += 1
+
+    db.commit()
+    return {"status": "success", "records_updated": records_updated}

@@ -988,6 +988,7 @@ async def list_shares(request: Request, db: Session = Depends(get_db), user: Use
         "configs": configs,
         "available_slots": available_slots,
         "user": user,
+        "today": date.today().isoformat(),
     })
 
 @app.post("/shares")
@@ -1024,6 +1025,21 @@ async def create_share(
         )
         db.add(config)
     db.commit()
+
+    # Recalculate processed_revenue_data from effective_date onwards
+    try:
+        if slot == "*":
+            # Global config: recalculate ALL slots
+            from crawler.process_revenue import recalculate_all_slots
+            recalculate_all_slots(db, from_date=ed)
+        else:
+            # Specific slot: recalculate only that slot
+            from crawler.process_revenue import recalculate_processed_data_for_slot
+            recalculate_processed_data_for_slot(db, slot, from_date=ed)
+    except Exception as e:
+        # Log error but don't fail the request
+        print(f"Warning: recalculate failed for slot {slot}: {e}")
+
     return RedirectResponse(url="/shares", status_code=303)
 
 @app.post("/shares/{config_id}/delete")
@@ -1032,8 +1048,26 @@ async def delete_share(request: Request, config_id: int, db: Session = Depends(g
         return user
     config = db.query(SlotShareConfig).filter(SlotShareConfig.id == config_id).first()
     if config:
+        slot = config.slot
+        effective_date = config.effective_date
         db.delete(config)
         db.commit()
+
+        # Recalculate processed_revenue_data from effective_date onwards
+        # This will use the previous share config or default 50%
+        try:
+            if slot == "*":
+                # Global config deleted: recalculate ALL slots
+                from crawler.process_revenue import recalculate_all_slots
+                recalculate_all_slots(db, from_date=effective_date)
+            else:
+                # Specific slot: recalculate only that slot
+                from crawler.process_revenue import recalculate_processed_data_for_slot
+                recalculate_processed_data_for_slot(db, slot, from_date=effective_date)
+        except Exception as e:
+            # Log error but don't fail the request
+            print(f"Warning: recalculate failed for slot {slot}: {e}")
+
     return RedirectResponse(url="/shares", status_code=303)
 
 
@@ -1080,7 +1114,7 @@ async def update_user_slots(
 
 
 # ----- Slot Assignment Overview (admin only) -----
-SLOT_PAGE_SIZE = 5
+SLOT_PAGE_SIZE = 25
 
 @app.get("/slot-assignments", response_class=HTMLResponse)
 async def slot_assignments_page(request: Request, db: Session = Depends(get_db), user: User = Depends(require_admin)):
@@ -1198,7 +1232,7 @@ async def admin_data_redirect(
     return RedirectResponse(url=f"/data?{q}" if q else "/data", status_code=302)
 
 
-PAGE_SIZE = 5
+PAGE_SIZE = 25
 
 @app.get("/data", response_class=HTMLResponse)
 async def view_data(

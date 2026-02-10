@@ -206,9 +206,15 @@ def get_share_for_slot(db: Session, slot: str, target_date) -> 'Decimal':
     """
     Lookup share % for a slot on a given date.
     Uses effective_date logic: find the most recent config where effective_date <= target_date.
-    Falls back to 50% if no config found.
+
+    Priority:
+    1. Specific slot config (if exists)
+    2. Global config (slot = "*") - applies to ALL sites
+    3. Fallback to 50% if no config found
     """
     from decimal import Decimal
+
+    # 1. Try to find config for specific slot
     config = db.query(SlotShareConfig).filter(
         SlotShareConfig.slot == slot,
         SlotShareConfig.effective_date <= target_date
@@ -216,6 +222,17 @@ def get_share_for_slot(db: Session, slot: str, target_date) -> 'Decimal':
 
     if config:
         return config.share_percent
+
+    # 2. Try to find global config (slot = "*")
+    global_config = db.query(SlotShareConfig).filter(
+        SlotShareConfig.slot == "*",
+        SlotShareConfig.effective_date <= target_date
+    ).order_by(SlotShareConfig.effective_date.desc()).first()
+
+    if global_config:
+        return global_config.share_percent
+
+    # 3. Fallback to default 50%
     return Decimal('50.00')
 
 
