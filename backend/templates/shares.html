@@ -36,7 +36,7 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Slot</label>
                     <select name="slot" required class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500">
-                        <option value="*" class="font-semibold text-emerald-600">⭐ All Sites (Global Default)</option>
+                        <option value="*" class="font-semibold text-emerald-600">⭐ New Sites (Default)</option>
                         <option disabled>──────────────</option>
                         {% for s in available_slots %}
                         <option value="{{ s }}">{{ s }}</option>
@@ -50,7 +50,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Effective Date</label>
-                    <input type="date" name="effective_date" required max="{{ today }}" value="{{ today }}"
+                    <input type="date" name="effective_date" required min="{{ today }}" max="{{ today }}" value="{{ today }}"
                         class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500">
                 </div>
                 <button type="submit" class="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors text-sm">
@@ -58,7 +58,7 @@
                 </button>
             </form>
             <p class="text-xs text-gray-500 mt-2">If a config already exists for the same slot + date, it will be updated. Default share is 50% if no config is set.</p>
-            <p class="text-xs text-emerald-600 mt-1"><strong>💡 Tip:</strong> Select "All Sites (Global Default)" to apply the same share % to ALL sites. This value will be inherited by all future data until you update it.</p>
+            <p class="text-xs text-emerald-600 mt-1"><strong>💡 Tip:</strong> Select "New Sites (Default)" to apply the same share % to new sites. This value will be inherited by all future data until you update it.</p>
         </div>
 
         <!-- Current configs table -->
@@ -77,7 +77,7 @@
                     {% for c in configs %}
                     <tr class="hover:bg-gray-50 {% if c.slot == '*' %}bg-emerald-50{% endif %}">
                         <td class="px-6 py-4 text-sm font-medium {% if c.slot == '*' %}text-emerald-700{% else %}text-gray-900{% endif %}">
-                            {% if c.slot == '*' %}⭐ All Sites (Global){% else %}{{ c.slot }}{% endif %}
+                            {% if c.slot == '*' %}⭐ New Sites (Default){% else %}{{ c.slot }}{% endif %}
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ c.share_percent|int }}%</td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ c.effective_date }}</td>
