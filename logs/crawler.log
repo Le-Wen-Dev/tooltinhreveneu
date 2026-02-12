@@ -341,3 +341,33 @@
 2026-02-11 00:48:39,804 - __main__ - INFO - Processed revenue data updated for dashboard.
 2026-02-11 00:48:39,809 - __main__ - INFO - Fetch completed successfully in 9s
 2026-02-11 00:48:39,813 - crawler.lock - INFO - Lock released for 2026-02-10
+2026-02-12 02:29:21,883 - crawler.lock - INFO - Lock acquired for 2026-02-11
+2026-02-12 02:29:21,906 - __main__ - INFO - Starting fetch for date: 2026-02-11
+2026-02-12 02:29:30,155 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-02-11&time_unit_date__range__lte=2026-02-11
+2026-02-12 02:29:32,564 - __main__ - INFO - Fetched 22 records
+2026-02-12 02:29:32,615 - __main__ - INFO - Stored: 22 created, 0 updated
+2026-02-12 02:29:32,616 - __main__ - INFO - Computing formulas...
+2026-02-12 02:29:32,697 - __main__ - INFO - Formulas computed successfully
+2026-02-12 02:29:32,749 - __main__ - INFO - Processed revenue data updated for dashboard.
+2026-02-12 02:29:32,774 - __main__ - INFO - Fetch completed successfully in 10s
+2026-02-12 02:29:32,782 - crawler.lock - INFO - Lock released for 2026-02-11
+2026-02-12 02:33:01,560 - crawler.lock - INFO - Lock acquired for 2026-02-11 (reused row)
+2026-02-12 02:33:01,567 - __main__ - INFO - Starting fetch for date: 2026-02-11
+2026-02-12 02:33:08,581 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-02-11&time_unit_date__range__lte=2026-02-11
+2026-02-12 02:33:10,322 - __main__ - INFO - Fetched 22 records
+2026-02-12 02:33:10,361 - __main__ - INFO - Stored: 0 created, 22 updated
+2026-02-12 02:33:10,361 - __main__ - INFO - Computing formulas...
+2026-02-12 02:33:10,417 - __main__ - INFO - Formulas computed successfully
+2026-02-12 02:33:10,442 - __main__ - INFO - Processed revenue data updated for dashboard.
+2026-02-12 02:33:10,447 - __main__ - INFO - Fetch completed successfully in 8s
+2026-02-12 02:33:10,451 - crawler.lock - INFO - Lock released for 2026-02-11
+2026-02-12 02:38:09,691 - crawler.lock - INFO - Lock acquired for 2026-02-11 (reused row)
+2026-02-12 02:38:09,700 - __main__ - INFO - Starting fetch for date: 2026-02-11
+2026-02-12 02:38:16,678 - __main__ - INFO - Fetching data from: https://gstudio.gliacloud.com/ad-sharing/publisher/revenueshare/?channel=No+Filter&time_unit_date__range__gte=2026-02-11&time_unit_date__range__lte=2026-02-11
+2026-02-12 02:38:18,341 - __main__ - INFO - Fetched 22 records
+2026-02-12 02:38:18,369 - __main__ - INFO - Stored: 0 created, 22 updated
+2026-02-12 02:38:18,369 - __main__ - INFO - Computing formulas...
+2026-02-12 02:38:18,417 - __main__ - INFO - Formulas computed successfully
+2026-02-12 02:38:18,442 - __main__ - INFO - Processed revenue data updated for dashboard.
+2026-02-12 02:38:18,446 - __main__ - INFO - Fetch completed successfully in 8s
+2026-02-12 02:38:18,450 - crawler.lock - INFO - Lock released for 2026-02-11

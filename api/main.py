@@ -1311,7 +1311,14 @@ async def view_data(
         total_pages = max(1, (total_count + PAGE_SIZE - 1) // PAGE_SIZE)
         page = min(page, total_pages)
         offset = (page - 1) * PAGE_SIZE
-        data = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).offset(offset).limit(PAGE_SIZE).all()
+
+        # Non-admin (client): không phân trang, lấy tất cả data
+        if is_admin:
+            data = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).offset(offset).limit(PAGE_SIZE).all()
+        else:
+            data = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).all()
+            total_pages = 1  # Không phân trang cho client
+
         available_dates = db.query(ProcessedRevenueData.fetch_date).distinct().order_by(ProcessedRevenueData.fetch_date.desc()).limit(365).all()
         available_dates = [d[0] for d in available_dates]
         # Available slots dropdown: also filtered for non-admin
@@ -1320,6 +1327,18 @@ async def view_data(
             available_slots = [s[0] for s in available_slots]
         else:
             available_slots = allowed_slot_names
+
+        # Tính summary cho user (non-admin)
+        summary = None
+        if not is_admin:
+            total_impr = sum(float(row.total_player_impr_2 or 0) for row in data)
+            total_rev = sum(float(row.revenue_2 or 0) for row in data)
+            avg_rpm = (total_rev / total_impr * 1000) if total_impr > 0 else 0
+            summary = {
+                "total_impr": total_impr,
+                "total_rev": total_rev,
+                "avg_rpm": round(avg_rpm, 2)
+            }
 
         return templates.TemplateResponse("processed_data_table.html", {
             "request": request,
@@ -1338,6 +1357,7 @@ async def view_data(
             "page_size": PAGE_SIZE,
             "base_url": BASE_URL,
             "api_docs_url": API_DOCS_URL,
+            "summary": summary,
         })
     else:
         query = db.query(RawRevenueData)
