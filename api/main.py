@@ -1333,12 +1333,13 @@ async def view_data(
         page = min(page, total_pages)
         offset = (page - 1) * PAGE_SIZE
 
-        # Admin: phân trang; Non-admin (client): lấy tất cả, không phân trang
-        if is_admin:
+        # Admin: phân trang (trừ khi đang filter 1 user cụ thể thì load hết)
+        # Non-admin (client): lấy tất cả, không phân trang
+        if is_admin and not filter_user_id:
             data = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).offset(offset).limit(PAGE_SIZE).all()
         else:
             data = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).all()
-            total_pages = 1  # Không phân trang cho client
+            total_pages = 1  # Không phân trang khi filter user hoặc với client
 
         available_dates = db.query(ProcessedRevenueData.fetch_date).distinct().order_by(ProcessedRevenueData.fetch_date.desc()).limit(365).all()
         available_dates = [d[0] for d in available_dates]
