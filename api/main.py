@@ -1246,8 +1246,11 @@ async def view_data(
     slot: Optional[str] = Query(None),
     view_type: str = Query("datafull", regex="^(raw|datafull)$"),
     page: int = Query(1, ge=1),
+    filter_user_id: Optional[int] = Query(None),
 ):
     """View data in table format - datafull (default) or raw. Raw chỉ admin; user xem datafull."""
+    if not isinstance(user, User):
+        return user  # RedirectResponse to /login
     if view_type == "raw" and (not user or getattr(user, "role", None) != "admin"):
         q = "view_type=datafull"
         if from_date:
@@ -1297,6 +1300,15 @@ async def view_data(
                 })
             query = query.filter(ProcessedRevenueData.slot.in_(allowed_slot_names))
 
+        # Admin: filter by selected user's assigned slots (filter_user_id)
+        if is_admin and filter_user_id:
+            user_slots = db.query(UserSlot.slot).filter(UserSlot.user_id == filter_user_id).all()
+            user_slot_names = [s[0] for s in user_slots]
+            if user_slot_names:
+                query = query.filter(ProcessedRevenueData.slot.in_(user_slot_names))
+            else:
+                query = query.filter(ProcessedRevenueData.slot == None)  # No slots → no data
+
         if fd:
             query = query.filter(ProcessedRevenueData.fetch_date == fd)
         else:
@@ -1312,12 +1324,12 @@ async def view_data(
         page = min(page, total_pages)
         offset = (page - 1) * PAGE_SIZE
 
-        # Non-admin (client): không phân trang, lấy tất cả data
-        if is_admin:
+        # Non-admin hoặc admin đang xem theo góc nhìn user: không phân trang, lấy tất cả data
+        if is_admin and not filter_user_id:
             data = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).offset(offset).limit(PAGE_SIZE).all()
         else:
             data = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).all()
-            total_pages = 1  # Không phân trang cho client
+            total_pages = 1  # Không phân trang cho client/user-view
 
         available_dates = db.query(ProcessedRevenueData.fetch_date).distinct().order_by(ProcessedRevenueData.fetch_date.desc()).limit(365).all()
         available_dates = [d[0] for d in available_dates]
@@ -1328,7 +1340,7 @@ async def view_data(
         else:
             available_slots = allowed_slot_names
 
-        # Tính summary cho user (non-admin)
+        # Tính summary cho user (non-admin) và admin
         summary = None
         if not is_admin:
             total_impr = sum(float(row.total_player_impr_2 or 0) for row in data)
@@ -1339,7 +1351,45 @@ async def view_data(
                 "total_rev": total_rev,
                 "avg_rpm": round(avg_rpm, 2)
             }
+        else:
+            # Admin summary: dùng revenue/total_player_impr (không phải _2)
+            total_impr_admin = sum(float(row.total_player_impr or 0) for row in data)
+            total_rev_admin = sum(float(row.revenue or 0) for row in data)
+            avg_rpm_admin = (total_rev_admin / total_impr_admin * 1000) if total_impr_admin > 0 else 0
+            total_impr2_admin = sum(float(row.total_player_impr_2 or 0) for row in data)
+            total_rev2_admin = sum(float(row.revenue_2 or 0) for row in data)
+            avg_rpm2_admin = (total_rev2_admin / total_impr2_admin * 1000) if total_impr2_admin > 0 else 0
+            summary = {
+                "total_impr": total_impr_admin,
+                "total_rev": total_rev_admin,
+                "avg_rpm": round(avg_rpm_admin, 2),
+                "total_impr2": total_impr2_admin,
+                "total_rev2": total_rev2_admin,
+                "avg_rpm2": round(avg_rpm2_admin, 2),
+            }
 
+        # Lấy danh sách users cho admin filter
+        all_users_for_filter = []
+        view_as_user = None
+        if is_admin:
+            all_users_for_filter = db.query(User).filter(User.is_active == True, User.role != "admin").order_by(User.username).all()
+            if filter_user_id:
+                view_as_user = db.query(User).filter(User.id == filter_user_id, User.is_active == True).first()
+
+        # Lấy share % hiện tại theo slot cho admin
+        slot_share_map = {}
+        if is_admin and data:
+            from datetime import date as date_cls
+            today = date_cls.today()
+            for row in data:
+                if row.slot not in slot_share_map:
+                    share_val = get_share_for_slot(db, row.slot, row.fetch_date or today)
+                    slot_share_map[row.slot] = float(share_val)
+
+        # Khi admin xem theo góc nhìn user: truyền user=view_as_user để template
+        # tự dùng logic hiển thị của role user (revenue_2, rpm_2, ẩn cột admin)
+        # admin_user giữ thông tin admin thật để navbar và badge vẫn hiển thị đúng
+        template_user = view_as_user if view_as_user else user
         return templates.TemplateResponse("processed_data_table.html", {
             "request": request,
             "data": data,
@@ -1350,7 +1400,8 @@ async def view_data(
             "to_date": to_d,
             "current_slot": slot,
             "view_type": "datafull",
-            "user": user,
+            "user": template_user,
+            "admin_user": user,  # admin thật — dùng cho navbar, badge, filter dropdown
             "page": page,
             "total_pages": total_pages,
             "total_count": total_count,
@@ -1358,6 +1409,10 @@ async def view_data(
             "base_url": BASE_URL,
             "api_docs_url": API_DOCS_URL,
             "summary": summary,
+            "all_users_for_filter": all_users_for_filter,
+            "filter_user_id": filter_user_id,
+            "slot_share_map": slot_share_map,
+            "view_as_user": view_as_user,
         })
     else:
         query = db.query(RawRevenueData)
