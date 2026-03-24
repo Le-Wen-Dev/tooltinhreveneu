@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Depends, Query, Request, Form, Heade
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import func as sa_func
 from typing import List, Optional
 from datetime import date
 import secrets
@@ -1333,7 +1334,7 @@ async def view_data(
         page = min(page, total_pages)
         offset = (page - 1) * PAGE_SIZE
 
-        # Admin: phân trang (trừ khi đang filter 1 user cụ thể thì load hết)
+        # Admin: luôn phân trang (trừ khi filter user cụ thể)
         # Non-admin (client): lấy tất cả, không phân trang
         if is_admin and not filter_user_id:
             data = query.order_by(ProcessedRevenueData.fetch_date.desc(), ProcessedRevenueData.slot).offset(offset).limit(PAGE_SIZE).all()
@@ -1362,12 +1363,19 @@ async def view_data(
                 "avg_rpm": round(avg_rpm, 2)
             }
         else:
-            # Admin summary: dùng revenue/total_player_impr (không phải _2)
-            total_impr_admin = sum(float(row.total_player_impr or 0) for row in data)
-            total_rev_admin = sum(float(row.revenue or 0) for row in data)
+            # Admin summary: tính trên TOÀN BỘ query (không bị giới hạn bởi phân trang)
+            # Dùng SQL aggregate để tính sum trực tiếp từ DB thay vì từ data (có thể bị phân trang)
+            agg_result = query.with_entities(
+                sa_func.coalesce(sa_func.sum(ProcessedRevenueData.total_player_impr), 0),
+                sa_func.coalesce(sa_func.sum(ProcessedRevenueData.revenue), 0),
+                sa_func.coalesce(sa_func.sum(ProcessedRevenueData.total_player_impr_2), 0),
+                sa_func.coalesce(sa_func.sum(ProcessedRevenueData.revenue_2), 0),
+            ).first()
+            total_impr_admin = float(agg_result[0])
+            total_rev_admin = float(agg_result[1])
+            total_impr2_admin = float(agg_result[2])
+            total_rev2_admin = float(agg_result[3])
             avg_rpm_admin = (total_rev_admin / total_impr_admin * 1000) if total_impr_admin > 0 else 0
-            total_impr2_admin = sum(float(row.total_player_impr_2 or 0) for row in data)
-            total_rev2_admin = sum(float(row.revenue_2 or 0) for row in data)
             avg_rpm2_admin = (total_rev2_admin / total_impr2_admin * 1000) if total_impr2_admin > 0 else 0
             summary = {
                 "total_impr": total_impr_admin,
